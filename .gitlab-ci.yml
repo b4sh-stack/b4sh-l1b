@@ -1,0 +1,22 @@
+before_script:
+   - /bin/bash -c "uptime ; curl -s ifconfig.co"
+#  - /bin/bash -c "test -d $HOME && (test -d ${HOME}/.ssh || mkdir -p  $HOME/.ssh) || mkdir -p  $HOME/.ssh "
+#  - ssh-keyscan -t rsa,dsa,ecdsa github.com >> ~/.ssh/ssh_known_hosts
+stages:
+  - mirror
+  
+variables:
+  MIRROR_REPOSITORY: "git@github.com:b4sh-stack/b4sh-l1b.git"
+
+mirror-github:
+  stage: mirror
+  cache: {}
+  script:
+    # set our privkey
+    - echo "${git64key}" |base64 -d > mybasekey
+    # Do a mirror clone of the repository
+    - git clone --mirror $CI_REPOSITORY_URL
+    # Mirror push it to the destination
+    - cd $CI_PROJECT_NAME.git
+    - ssh-agent bash -c " chmod 0600 ../mybasekey ;ssh-add ../mybasekey ;test -d $HOME && (test -d ${HOME}/.ssh || mkdir -p  $HOME/.ssh) || mkdir -p  $HOME/.ssh;(ssh-keyscan -t rsa,dsa,ecdsa github.com  ;ssh-keyscan -t rsa,dsa,ecdsa gitlab.com ) |tee  ~/.ssh/known_hosts ~/.ssh/ssh_known_hosts ;git push --mirror $MIRROR_REPOSITORY"
+    - cd ..; rm -rf $CI_PROJECT_NAME.git mybasekey
