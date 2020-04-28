@@ -1,7 +1,8 @@
 #!/bin/sh
 declare -r TRUE=0
 declare -r FALSE=1
-##busybox is lacking many functions like tac / rev , even iproute standards like tun are mising in default openwrt builds ## http://sed.sourceforge.net/local/docs/emulating_unix.txt https://edoras.sdsu.edu/doc/sed-oneliners.html  https://unix.stackexchange.com/questions/9356/how-can-i-print-lines-from-file-backwards-without-using-tac https://www.geeksforgeeks.org/reverse-a-string-shell-programming/ https://www.unix.com/shell-programming-and-scripting/223077-awk-reverse-string.html https://thomas-cokelaer.info/blog/2018/01/awk-convert-into-lower-or-upper-cases/
+##busybox is lacking many functions like tac / rev , even iproute standards like tun are mising in default openwrt builds 
+## http://sed.sourceforge.net/local/docs/emulating_unix.txt https://edoras.sdsu.edu/doc/sed-oneliners.html  https://unix.stackexchange.com/questions/9356/how-can-i-print-lines-from-file-backwards-without-using-tac https://www.geeksforgeeks.org/reverse-a-string-shell-programming/ https://www.unix.com/shell-programming-and-scripting/223077-awk-reverse-string.html https://thomas-cokelaer.info/blog/2018/01/awk-convert-into-lower-or-upper-cases/
 
 which tac &>/dev/null || tac() { sed '1!G;h;$!d' $1 ; } ;
 
