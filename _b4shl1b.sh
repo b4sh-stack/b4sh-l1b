@@ -14,6 +14,20 @@ which rev &>/dev/null || rev() { sed -nr '/\n/!G;s/(.)(.*\n)/&\2\1/;/^\n/!D;s/\n
 timestamp_nanos() { if [[ $(date +%s%N |wc -c) -eq 20  ]]; then date -u +%s%N;else expr $(date -u +%s) "*" 1000 "*" 1000 "*" 1000 ; fi ; } ;
 
 
+###SYS
+
+##CHROOT
+
+    _chroot_mount() {
+    CHR_TARGET=$1
+    dirs_there=0;test -d /${CHR_TARGET}/dev && test -d /${CHR_TARGET}/proc && test -d /${CHR_TARGET}/sys && dirs_there=1
+    
+    if [ "$dirs_there" -eq 1]; then
+        #for infolder in dev proc sys dev/pts ;do echo -n "mount --bind /"$infolder'/${CHR_TARGET} '" && ";done;echo 
+        mount --bind /dev/${CHR_TARGET}  && mount --bind /proc/${CHR_TARGET}  && mount --bind /sys/${CHR_TARGET}  && mount --bind /dev/pts/${CHR_TARGET}  &&  echo "seems mounted use chroot ${CHR_TARGET}" || echo seems something failed
+    fi ; } ;
+
+
 ###NETWORK
 
 ## IPV4 
