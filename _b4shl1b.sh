@@ -23,7 +23,7 @@ timestamp_nanos() { if [[ $(date +%s%N |wc -c) -eq 20  ]]; then date -u +%s%N;el
 is_ipv6() { target=$1; if [ "$(echo -n $target|tr -cd 'abcdef1234567890:'|wc -c)" -eq "$(echo -n $target|wc -c)" ] ; then return 1;else return 0;fi } ;
 
 
-##DNS
+### ↓↓ DNS ↓↓ ##
 
 _nslookup_ip4() { 
           #1 target          #2 nameserver 
@@ -65,7 +65,7 @@ _nslookup_ptr() {            #1 target          #2 nameserver
                     fi
                     } ;
 
-                    
+
 _nslookup() { 
           #1 target          #2 type          #3 nameserver 
           ##→ looks like nslookup -query=TXT google.com 8.8.8.8
@@ -84,13 +84,15 @@ _nslookup() {
 
 } ;
 
+### ↑↑ DNS ↑↑ ##
+
 
 ### VM
 
 
-###  VirtualBox
+##### ↓↓ VirtualBox ↓↓ ####
 
-### get stopped vms and start them
+####### get stopped vms and start them
 _virtualbox_start_all() { vboxmanage list vms -l | grep -e ^Name: -e ^State  |sed 's/Name:/Name:̣°/g;s/State:/State:@@/g;s/\ \ //g;s/@ /@/g' | cut -d: -f2-|tr -d '\n' |sed 's/°/\n/g'|grep -e "(" -e since|grep -v "@@running"|cut -d"@" -f1|while read startme ;do vboxmanage startvm "${startme}" --type headless;done ; };
 
 ## stop all instances found
@@ -118,6 +120,7 @@ _virtualbox_snapshots_delete_interactive() { while (true);do
                                             vboxmanage snapshot ${virmach} delete ${virsnap} &> /tmp/vbox.snap.del.${virmach}.${virsnap} & 
                                             echo "sleeping 2s ";sleep 2 ; done 
                                             echo "Monitoring Process, press CTRL+C to quit"; tail -f  /tmp/vbox.snap.del.* ; } ;
+##### ↑↑ VirtualBox ↑↑ ####
 
 
 
