@@ -89,11 +89,16 @@ _nslookup() {
 
 
 ###  VirtualBox
+
+### get stopped vms and start them
 _virtualbox_start_all() { vboxmanage list vms -l | grep -e ^Name: -e ^State  |sed 's/Name:/Name:̣°/g;s/State:/State:@@/g;s/\ \ //g;s/@ /@/g' | cut -d: -f2-|tr -d '\n' |sed 's/°/\n/g'|grep -e "(" -e since|grep -v "@@running"|cut -d"@" -f1|while read startme ;do vboxmanage startvm "${startme}" --type headless;done ; };
 
+## stop all instances found
 _virtualbox_stop_all() { vboxmanage list vms|cut -d"{" -f2|cut -d"}" -f1|while read stopme ;do vboxmanage controlvm "$stopme" acpipowerbutton ;done ; } ;
 
-_virtualbox_list_snapshots_all() { vboxmanage list vms|cut -d\" -f2 |while read virmach ;do vboxmanage showvminfo $virmach|grep -e Snapshots: -e Name:|sed 's/^/'$virmach'\t|\t\t/g' ;for dot in {1..80};do echo -n ".";done;echo  ;done ; } ;
+
+_virtualbox_list_snapshots_all() { vboxmanage list vms|cut -d\" -f2 |while read virmach ;do 
+                                  vboxmanage showvminfo $virmach|grep -e Snapshots: -e Name:|sed 's/^/'$virmach'\t|\t\t/g' ;for dot in {1..80};do echo -n ".";done;echo  ;done ; } ;
 
 
 
