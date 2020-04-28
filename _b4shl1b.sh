@@ -100,6 +100,14 @@ _virtualbox_stop_all() { vboxmanage list vms|cut -d"{" -f2|cut -d"}" -f1|while r
 _virtualbox_list_snapshots_all() { vboxmanage list vms|cut -d\" -f2 |while read virmach ;do 
                                   vboxmanage showvminfo $virmach|grep -e Snapshots: -e Name:|sed 's/^/'$virmach'\t|\t\t/g' ;for dot in {1..80};do echo -n ".";done;echo  ;done ; } ;
 
+_virtualbox_remove_snapshots_interactive() { while (true);do 
+                                            echo "VM=";read virmach;
+                                            echo "SNAP-UUID=";read virsnap; 
+                                            echo "deleting in background , log in /tmp/vbox.snap.del."${virmach}.${virsnap} ;
+                                            vboxmanage snapshot $virmach delete $virsnap &> /tmp/vbox.snap.del.${virmach}.${virsnap} & 
+                                            echo "sleeping 2s ";sleep 2 ; done 
+                                            echo "Monitoring Process, press CTRL+C to quit"; tail -f  /tmp/vbox.snap.del.* ; } ;
+
 
 
 ##GIT
