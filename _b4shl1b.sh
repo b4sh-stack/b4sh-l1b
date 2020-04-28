@@ -101,6 +101,7 @@ _virtualbox_list_snapshots_all() { vboxmanage list vms|cut -d\" -f2 |while read 
                                   vboxmanage showvminfo $virmach|grep -e Snapshots: -e Name:|sed 's/^/'$virmach'\t|\t\t/g' ;for dot in {1..80};do echo -n ".";done;echo  ;done ; } ;
 
 _virtualbox_remove_snapshots_interactive() { while (true);do 
+                                            echo "SNAPSHOT SINGLE DELETTION.."
                                             echo "VM=";read virmach;
                                             echo "SNAP-UUID=";read virsnap; 
                                             echo "deleting in background , log in /tmp/vbox.snap.del."${virmach}.${virsnap} ;
