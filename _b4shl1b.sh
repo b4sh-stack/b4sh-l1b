@@ -18,7 +18,7 @@ timestamp_nanos() { if [[ $(date +%s%N |wc -c) -eq 20  ]]; then date -u +%s%N;el
 
 ##CHROOT
 
-    _chroot_mount() {
+_chroot_mount() {
     CHR_TARGET=$1
     dirs_there=0;test -d /${CHR_TARGET}/dev && test -d /${CHR_TARGET}/proc && test -d /${CHR_TARGET}/sys && dirs_there=1
     
