@@ -155,16 +155,16 @@ _virtualbox_snapshots_delete_interactive() { while (true);do
 _git_commitpush() { git add -A ;git commit -m "$(date -u +%Y-%m-%d-%H.%M)"" $COMMITCOMMENT" ; git push ; } ;
 
 _git_autocommit() { sum=$(find ./ -type f -exec md5sum {} \;|grep -v ".git/" |md5sum);
-echo "TESTING FOR GIT DIRECTORY IN" $(pwd)
-test -d .git && ( while (true);do 
-    sleep 8;
-    sum_cur=$(find ./ -type f -exec md5sum {} \;|grep -v ".git/" |md5sum);
-    if [ "$sum" == "$sum_cur" ] ; then 
-        echo -ne "\rnothing changed@"$(date -u);
-    else
-        echo -ne "\rsmthing changed@"$(date -u)"  == "$(echo $sum_cur|head -c6)" >> cnt:(m:"$(git rev-list --count master)") (a:)"$(git rev-list --all --count)" ==>";
-        git_commitpush 2>&1|grep -v "^To "|sed 's/^ create mode /+/g;s/^/|/g' |tr -d '\n' ; sum="$sum_cur";echo;
-        sync &
-                 fi;
-  done
+    echo "TESTING FOR GIT DIRECTORY IN" $(pwd)
+    test -d .git && ( while (true);do 
+        sleep 8;
+        sum_cur=$(find ./ -type f -exec md5sum {} \;|grep -v ".git/" |md5sum);
+        if [ "$sum" == "$sum_cur" ] ; then 
+            echo -ne "\rnothing changed@"$(date -u);
+        else
+            echo -ne "\rsmthing changed@"$(date -u)"  == "$(echo $sum_cur|head -c6)" >> cnt:(m:"$(git rev-list --count master)") (a:)"$(git rev-list --all --count)" ==>";
+            git_commitpush 2>&1|grep -v "^To "|sed 's/^ create mode /+/g;s/^/|/g' |tr -d '\n' ; sum="$sum_cur";echo;
+            sync &
+                     fi;
+      done
  ; } ;
