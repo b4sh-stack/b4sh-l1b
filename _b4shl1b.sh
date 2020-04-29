@@ -22,6 +22,8 @@ timestamp_nanos() { if [[ $(date +%s%N |wc -c) -eq 20  ]]; then date -u +%s%N;el
 _quote_single() { sed "s/\(^\|$\)/'/g" ; } ;
 _quote_double() { sed 's/\(^\|$\)/"/g' ; } ;
 
+_dedup_sort() { sort "$@" | uniq }
+
 
 
 ###SYS
