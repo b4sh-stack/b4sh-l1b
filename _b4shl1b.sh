@@ -17,6 +17,10 @@ which rev &>/dev/null || rev() { sed -nr '/\n/!G;s/(.)(.*\n)/&\2\1/;/^\n/!D;s/\n
 ###### e.g. OpenWRT busybox will fail on ↓ this↓ test ####   →   flatten it to seconds
 timestamp_nanos() { if [[ $(date +%s%N |wc -c) -eq 20  ]]; then date -u +%s%N;else expr $(date -u +%s) "*" 1000 "*" 1000 "*" 1000 ; fi ; } ;
 
+### HELPERS/UTILS
+
+_quote_single() { sed "s/\(^\|$\)/'/g" ; } ;
+_quote_double() { sed 's/\(^\|$\)/"/g' ; } ;
 
 ###SYS
 
