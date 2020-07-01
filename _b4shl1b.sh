@@ -126,17 +126,19 @@ _virtualbox_stop_all() { vboxmanage list vms|cut -d"{" -f2|cut -d"}" -f1|while r
 
 
 
-_virtualbox_snapshots_list_all() { vboxmanage list vms|cut -d\" -f2 |while read virmach ;do 
-                                  vboxmanage showvminfo $virmach|grep -e Snapshots: -e Name:|sed 's/^/'$virmach'\t|\t\t/g' ;for dot in {1..80};do echo -n ".";done;echo  ;done ; } ;
+_virtualbox_snapshots_list_all() { vboxmanage list vms|cut -d\" -f2 |sed 's/\t//g'|while read virmach ;do 
+                                  vboxmanage showvminfo "$virmach"|grep -e Snapshots: -e Name:|sed 's/^/\t|\t\t/g'|while read line;do echo "${virmach}${line}";done ;
+                                  for dot in {1..80};do echo -n ".";done;echo  ;done ; } ;
 
-_virtualbox_snapshots_create_allmachines() { 
+
+_virtualbox_snapshots_create_allmachines_online() { 
    SNAPSHOT_NAME="YourNameHere"
    SNAPSHOT_ID=$(date -u +%Y-%m-%d_%H.%M)"-$SNAPSHOT_NAME"
    SNAPSHOT_DESCRIPTION="YourCommentHere"
    vboxmanage list vms|cut -d\" -f2 |while read virmach ;do 
        echo "backing up "${virmach}"... stay calm and ignore the percentage ( it IS slow around 90 percent, thats not an error) :) ";
        echo "name:"${SNAPSHOT_ID};
-       vboxmanage snapshot $virmach take "$SNAPSHOT_ID" --description "$SNAPSHOT_DESCRIPTION";done ; } ;
+       vboxmanage snapshot "${virmach}" take "$SNAPSHOT_ID" --description "$SNAPSHOT_DESCRIPTION";done ; } ;
 
 _virtualbox_snapshots_delete_interactive() { while (true);do 
                                             echo "SNAPSHOT SINGLE DELETTION.."
