@@ -144,8 +144,8 @@ _virtualbox_snapshots_delete_interactive() { while (true);do
                                             echo "SNAPSHOT SINGLE DELETTION.."
                                             echo "VM=";read virmach;
                                             echo "SNAP-UUID=";read virsnap; 
-                                            echo "deleting in background , log in /tmp/vbox.snap.del."${virmach}.${virsnap} ;
-                                            vboxmanage snapshot ${virmach} delete ${virsnap} &> /tmp/vbox.snap.del.${virmach}.${virsnap} & 
+                                            echo "deleting in background , log in /tmp/vbox.snap.del.${virmach}.${virsnap}" ;
+                                            vboxmanage snapshot "${virmach}" delete "${virsnap}" &> "/tmp/vbox.snap.del.${virmach}.${virsnap}" & 
                                             echo "sleeping 2s ";sleep 2 ; done 
                                             echo "Monitoring Process, press CTRL+C to quit"; tail -f  /tmp/vbox.snap.del.* ; } ;
 ##### ↑↑ VirtualBox ↑↑ ####
