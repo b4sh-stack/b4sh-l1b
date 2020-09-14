@@ -24,6 +24,7 @@ _quote_single() { sed "s/\(^\|$\)/'/g" ; } ;
 _quote_double() { sed 's/\(^\|$\)/"/g' ; } ;
 
 _dedup_sort() { sort "$@" | uniq ; }; 
+_dedup() { awk '!x[$0]++' ; } ;
 
 ###SYS
 
