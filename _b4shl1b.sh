@@ -1,8 +1,9 @@
 #!/bin/sh
-declare -r TRUE=0
-declare -r FALSE=1
 
-##busybox is lacking many functions like tac / rev , even iproute standards like tun are mising in default openwrt builds 
+#declare -r TRUE=0
+#declare -r FALSE=1
+
+##busybox is lacking many functions like tac / rev , even iproute standards like tun are mising in default openwrt builds
 ## http://sed.sourceforge.net/local/docs/emulating_unix.txt https://edoras.sdsu.edu/doc/sed-oneliners.html  https://unix.stackexchange.com/questions/9356/how-can-i-print-lines-from-file-backwards-without-using-tac https://www.geeksforgeeks.org/reverse-a-string-shell-programming/ https://www.unix.com/shell-programming-and-scripting/223077-awk-reverse-string.html https://thomas-cokelaer.info/blog/2018/01/awk-convert-into-lower-or-upper-cases/
 
 ### REDEFINE MISSING FUNCTIONS
@@ -22,9 +23,7 @@ timestamp_nanos() { if [[ $(date +%s%N |wc -c) -eq 20  ]]; then date -u +%s%N;el
 _quote_single() { sed "s/\(^\|$\)/'/g" ; } ;
 _quote_double() { sed 's/\(^\|$\)/"/g' ; } ;
 
-_dedup_sort() { sort "$@" | uniq }
-
-
+_dedup_sort() { sort "$@" | uniq ; }; 
 
 ###SYS
 
@@ -33,16 +32,16 @@ _dedup_sort() { sort "$@" | uniq }
 _chroot_mount() {
     CHR_TARGET=$1
     dirs_there=0;test -d /${CHR_TARGET}/dev && test -d /${CHR_TARGET}/proc && test -d /${CHR_TARGET}/sys && dirs_there=1
-    
+
     if [ "$dirs_there" -eq 1]; then
-        #generation : for infolder in dev proc sys dev/pts ;do echo -n "mount --bind /"$infolder'/${CHR_TARGET} '" && ";done;echo 
+        #generation : for infolder in dev proc sys dev/pts ;do echo -n "mount --bind /"$infolder'/${CHR_TARGET} '" && ";done;echo
         mount --bind /dev/${CHR_TARGET}  && mount --bind /proc/${CHR_TARGET}  && mount --bind /sys/${CHR_TARGET}  && mount --bind /dev/pts/${CHR_TARGET}  &&  echo "seems mounted use chroot ${CHR_TARGET}" || echo seems something failed
     fi ; } ;
 
 
 ###NETWORK
 
-## IPV4 
+## IPV4
 
 ## IPv6
 
@@ -51,8 +50,8 @@ is_ipv6() { target=$1; if [ "$(echo -n $target|tr -cd 'abcdef1234567890:'|wc -c)
 
 ### ↓↓ DNS ↓↓ ##
 
-_nslookup_ip4() { 
-          #1 target          #2 nameserver 
+_nslookup_ip4() {
+          #1 target          #2 nameserver
           ##→ looks like nslookup -query=A google.com 8.8.8.8
           target="";query="-query=A";namesrv="";
           if [ -z "$1" ]; then return 666; else target="$1" ;fi #no target no fun
@@ -61,8 +60,8 @@ _nslookup_ip4() {
 
                     } ;
 
-_nslookup_ip6() { 
-          #1 target          #2 nameserver 
+_nslookup_ip6() {
+          #1 target          #2 nameserver
           ##→ looks like nslookup -query=AAAA google.com 8.8.8.8
           target="";query="-query=AAAA";namesrv="";
           if [ -z "$1" ]; then return 666; else target="$1" ;fi #no target no fun
@@ -71,7 +70,7 @@ _nslookup_ip6() {
               };
 
 ## Props : https://unix.stackexchange.com/questions/132779/how-to-read-an-ip-address-backwards/132785 https://de.unixqa.net/q/wie-lese-ich-eine-ip-adresse-ruckwarts-4965
-_nslookup_ptr() {            #1 target          #2 nameserver 
+_nslookup_ptr() {            #1 target          #2 nameserver
                   target="";query="-query=PTR";namesrv="";
                   if [ -z "$1" ]; then return 666; else target="$1" ;fi #no target no fun
                   if [ ! -z "$2" ];then namesrv="$2";fi
@@ -92,8 +91,8 @@ _nslookup_ptr() {            #1 target          #2 nameserver
                     } ;
 
 
-_nslookup() { 
-          #1 target          #2 type          #3 nameserver 
+_nslookup() {
+          #1 target          #2 type          #3 nameserver
           ##→ looks like nslookup -query=TXT google.com 8.8.8.8
           target="";query="";namesrv="";
           if [ -z "$1" ]; then return 666; else target="$1" ;fi #no target no fun
@@ -102,9 +101,9 @@ _nslookup() {
           ##https://en.wikipedia.org/wiki/List_of_DNS_record_types
           case $query in
               AFSDB|APL|CAA|CDNSKEY|CDS|CERT|CNAME|CSYNC|DHCID|DLV|DNAME|DNSKEY|DS|HINFO|HIP|IPSECKEY|KEY|KX|LOC|MX|NAPTR|NS|NSEC|NSEC3|NSEC3PARAM|OPENPGPKEY|PTR|RRSIG|RP|SIG|SMIMEA|SOA|SRV|SSHFP|TA|TKEY|TLSA|TSIG|TXT|URI|ZONEMD|AXFR|IXFR|OPT|MD|MF|MAILA|MB|MG|MR|MINFO|MAILB|WKS|NB|NBSTAT|NULL|A6|NXT|KEY|SIG|HINFO|RP|X25|ISDN|RT|NSAP|NSAP-PTR|PX|EID|NIMLOC|ATMA|APL|SINK|GPOS|UINFO|UID|GID|UNSPEC|SPF|NINFO|RKEY|TALINK|NID|L32|L64|LP|EUI48|EUI64|DOA) query="-query=$query";;
-              A) _nslookup_ip4 "$1" "$3" ;
-              AAAA) _nslookup_ip6 "$1" "$3" ;
-              *) query="";;
+              A) _nslookup_ip4 "$1" "$3" ;;
+              AAAA) _nslookup_ip6 "$1" "$3" ;;
+              *) query="" ;;
           esac
             nslookup $query $target $namesrv |sed '/Server/,/'$target'/{//!d}'
 
@@ -126,47 +125,47 @@ _virtualbox_stop_all() { vboxmanage list vms|cut -d"{" -f2|cut -d"}" -f1|while r
 
 
 
-_virtualbox_snapshots_list_all() { vboxmanage list vms|cut -d\" -f2 |sed 's/\t//g'|while read virmach ;do 
+_virtualbox_snapshots_list_all() { vboxmanage list vms|cut -d\" -f2 |sed 's/\t//g'|while read virmach ;do
                                   vboxmanage showvminfo "$virmach"|grep -e Snapshots: -e Name:|sed 's/^/\t|\t\t/g'|while read line;do echo "${virmach}${line}";done ;
                                   for dot in {1..80};do echo -n ".";done;echo  ;done ; } ;
 
 
-_virtualbox_snapshots_create_allmachines_online() { 
+_virtualbox_snapshots_create_allmachines_online() {
    SNAPSHOT_NAME="YourNameHere"
    SNAPSHOT_ID=$(date -u +%Y-%m-%d_%H.%M)"-$SNAPSHOT_NAME"
    SNAPSHOT_DESCRIPTION="YourCommentHere"
-   vboxmanage list vms|cut -d\" -f2 |while read virmach ;do 
+   vboxmanage list vms|cut -d\" -f2 |while read virmach ;do
        echo "backing up "${virmach}"... stay calm and ignore the percentage ( it IS slow around 90 percent, thats not an error) :) ";
        echo "name:"${SNAPSHOT_ID};
        vboxmanage snapshot "${virmach}" take "$SNAPSHOT_ID" --description "$SNAPSHOT_DESCRIPTION";done ; } ;
 
-_virtualbox_snapshots_delete_interactive() { while (true);do 
+_virtualbox_snapshots_delete_interactive() { while (true);do
                                             echo "SNAPSHOT SINGLE DELETTION.."
                                             echo "VM=";read virmach;
-                                            echo "SNAP-UUID=";read virsnap; 
+                                            echo "SNAP-UUID=";read virsnap;
                                             echo "deleting in background , log in /tmp/vbox.snap.del.${virmach}.${virsnap}" ;
-                                            vboxmanage snapshot "${virmach}" delete "${virsnap}" &> "/tmp/vbox.snap.del.${virmach}.${virsnap}" & 
-                                            echo "sleeping 2s ";sleep 2 ; done 
+                                            vboxmanage snapshot "${virmach}" delete "${virsnap}" &> "/tmp/vbox.snap.del.${virmach}.${virsnap}" &
+                                            echo "sleeping 2s ";sleep 2 ; done
                                             echo "Monitoring Process, press CTRL+C to quit"; tail -f  /tmp/vbox.snap.del.* ; } ;
 ##### ↑↑ VirtualBox ↑↑ ####
-
-
 
 ##GIT
 
 _git_commitpush() { git add -A ;git commit -m "$(date -u +%Y-%m-%d-%H.%M)"" $COMMITCOMMENT" ; git push ; } ;
 
-_git_autocommit() { sum=$(find ./ -type f -exec md5sum {} \;|grep -v ".git/" |md5sum);
-    echo "TESTING FOR GIT DIRECTORY IN" $(pwd)
-    test -d .git && ( while (true);do 
+
+_git_autocommit() { echo -n;
+	sum=$(find ./ -type f -exec md5sum {} \;|grep -v ".git/" |md5sum);
+    echo "TESTING FOR GIT DIRECTORY IN" $(pwd);
+    test -d .git && ( while (true);do
         sleep 8;
         sum_cur=$(find ./ -type f -exec md5sum {} \;|grep -v ".git/" |md5sum);
-        if [ "$sum" == "$sum_cur" ] ; then 
+        if [ "$sum" == "$sum_cur" ] ; then
             echo -ne "\rnothing changed@"$(date -u);
         else
             echo -ne "\rsmthing changed@"$(date -u)"  == "$(echo $sum_cur|head -c6)" >> cnt:(m:"$(git rev-list --count master)") (a:)"$(git rev-list --all --count)" ==>";
-            git_commitpush 2>&1|grep -v "^To "|sed 's/^ create mode /+/g;s/^/|/g' |tr -d '\n' ; sum="$sum_cur";echo;
+            _git_commitpush 2>&1|grep -v "^To "|sed 's/^ create mode /+/g;s/^/|/g' |tr -d '\n' ; sum="$sum_cur";echo;
             sync &
                      fi;
-      done
- ; } ;
+      done )
+ echo -n " "; } ;
