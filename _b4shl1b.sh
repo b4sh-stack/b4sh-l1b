@@ -39,6 +39,11 @@ _chroot_mount() {
         mount --bind /dev/${CHR_TARGET}  && mount --bind /proc/${CHR_TARGET}  && mount --bind /sys/${CHR_TARGET}  && mount --bind /dev/pts/${CHR_TARGET}  &&  echo "seems mounted use chroot ${CHR_TARGET}" || echo seems something failed
     fi ; } ;
 
+_mysql_optimize_all_tables() {
+  if [ -z "$1" ]; then return 666; else SBNAME="$1" ;fi #no target no fun
+  mysql -e "show tables"  $DBNAME|cat|while read table ;do mysql -e "OPTIMIZE TABLE $table" "$DBNAME" ;done
+  echo ; } ;
+ 
 
 ###NETWORK
 
