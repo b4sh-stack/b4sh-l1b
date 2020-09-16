@@ -28,7 +28,7 @@ _dedup() { awk '!x[$0]++' ; } ;
 
 
 
-###SYS
+#SYS
 
 ##CHROOT
 
@@ -46,6 +46,17 @@ _mysql_optimize_all_tables() {
   mysql -e "show tables"  $DBNAME|cat|while read table ;do mysql -e "OPTIMIZE TABLE $table" "$DBNAME" ;done
   echo ; } ;
 
+##DOCKER
+
+_docker_stats_json() {
+  docker stats --no-stream --format "{\"container\":\"{{ .Container }}\",\"memory\":{\"raw\":\"{{ .MemUsage }}\",\"percent\":\"{{ .MemPerc }}\"},\"cpu\":\"{{ .CPUPerc }}\"}"  --filter "status=running" ; } ;
+
+
+_docker_stats_json_all() {
+  docker stats --no-stream --format "{\"container\":\"{{ .Container }}\",\"memory\":{\"raw\":\"{{ .MemUsage }}\",\"percent\":\"{{ .MemPerc }}\"},\"cpu\":\"{{ .CPUPerc }}\"}" ; } ;
+
+_docker_containers_all()    { docker ps -a --format '{{.Names}}' ; } ;
+_docker_containers_exited() { docker ps -a --format '{{.Names}}' --filter "status=exited" ; } ;
 
 ###NETWORK
 
