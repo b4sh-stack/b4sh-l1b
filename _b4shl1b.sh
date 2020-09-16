@@ -23,8 +23,10 @@ timestamp_nanos() { if [[ $(date +%s%N |wc -c) -eq 20  ]]; then date -u +%s%N;el
 _quote_single() { sed "s/\(^\|$\)/'/g" ; } ;
 _quote_double() { sed 's/\(^\|$\)/"/g' ; } ;
 
-_dedup_sort() { sort "$@" | uniq ; }; 
+_dedup_sort() { sort "$@" | uniq ; };
 _dedup() { awk '!x[$0]++' ; } ;
+
+
 
 ###SYS
 
@@ -43,7 +45,7 @@ _mysql_optimize_all_tables() {
   if [ -z "$1" ]; then return 666; else SBNAME="$1" ;fi #no target no fun
   mysql -e "show tables"  $DBNAME|cat|while read table ;do mysql -e "OPTIMIZE TABLE $table" "$DBNAME" ;done
   echo ; } ;
- 
+
 
 ###NETWORK
 
@@ -175,3 +177,15 @@ _git_autocommit() { echo -n;
                      fi;
       done )
  echo -n " "; } ;
+
+### HTML/CGI-bin
+
+
+_html_userinfo() {
+    echo '<div id="userinfo">' ;
+    echo '<table id="userinfotable"><tr>';
+    for param in SCRIPT_NAME SSL_PROTOCOL SSL_CIPHER_USEKEYSIZE SSL_CIPHER_ALGKEYSIZE HTTP_USER_AGENT GATEWAY_INTERFACE ; do echo '<th>'${param}' </th>' ; done
+    echo '</tr><tr>'
+    for param in SCRIPT_NAME SSL_PROTOCOL SSL_CIPHER_USEKEYSIZE SSL_CIPHER_ALGKEYSIZE HTTP_USER_AGENT GATEWAY_INTERFACE ; do echo '<td>'${$param}' </td>' ; done
+    echo '</tr></table>'
+    echo '</div>'   ; } ;
