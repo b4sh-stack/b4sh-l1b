@@ -182,7 +182,7 @@ _git_autocommit() { echo -n;
 
 
 _html_userinfo() {
-    echo '<div id="userinfo">' ;
+    echo '<div id="userinfo" class="userinfo">' ;
     echo '<table id="userinfotable" class="userinfo"><tr>';
     for param in SCRIPT_NAME SSL_PROTOCOL SSL_CIPHER_USEKEYSIZE SSL_CIPHER_ALGKEYSIZE HTTP_USER_AGENT GATEWAY_INTERFACE ; do echo '<th>'${param}' </th>' ; done
     echo '</tr><tr>'
