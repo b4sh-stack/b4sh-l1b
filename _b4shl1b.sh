@@ -49,11 +49,11 @@ _mysql_optimize_all_tables() {
 ##DOCKER
 
 _docker_stats_json() {
-  docker stats --no-stream --format "{\"container\":\"{{ .Container }}\",\"memory\":{\"raw\":\"{{ .MemUsage }}\",\"percent\":\"{{ .MemPerc }}\"},\"cpu\":\"{{ .CPUPerc }}\"}"  --filter "status=running" ; } ;
+  docker stats --no-stream --format "{\"container\":\"{{ .Container }}\",\"memory\":{\"raw\":\"{{ .MemUsage }}\",\"percent\":\"{{ .MemPerc }}\"},\"cpu\":\"{{ .CPUPerc }}\"}"  ; } ;
 
 
 _docker_stats_json_all() {
-  docker stats --no-stream --format "{\"container\":\"{{ .Container }}\",\"memory\":{\"raw\":\"{{ .MemUsage }}\",\"percent\":\"{{ .MemPerc }}\"},\"cpu\":\"{{ .CPUPerc }}\"}" ; } ;
+  docker stats --no-stream --format "{\"container\":\"{{ .Container }}\",\"memory\":{\"raw\":\"{{ .MemUsage }}\",\"percent\":\"{{ .MemPerc }}\"},\"cpu\":\"{{ .CPUPerc }}\"}" --all; } ;
 
 _docker_containers_all()    { docker ps -a --format '{{.Names}}' ; } ;
 _docker_containers_exited() { docker ps -a --format '{{.Names}}' --filter "status=exited" ; } ;
