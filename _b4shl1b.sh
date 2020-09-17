@@ -61,7 +61,7 @@ _docker_stats_json() {
 _docker_stats_json_all() {
   docker stats --no-stream --format "{\"container\":\"{{ .Container }}\",\"memory\":{\"raw\":\"{{ .MemUsage }}\",\"percent\":\"{{ .MemPerc }}\"},\"cpu\":\"{{ .CPUPerc }}\"}" --all ; } ;
 
-_docker_stats_json_array() { _docker_stats_json "$@" |sed 's/$/,/g'| _oneline |sed 's/^/[/g;s/$/]/g'  ; } ;
+_docker_stats_json_array() { _docker_stats_json "$@" |sed 's/$/,/g'| _oneline |sed 's/^/[/g;s/,$/]/g'  ; } ;
 
 _docker_containers_all()    { docker ps -a --format '{{.Names}}' ; } ;
 _docker_containers_exited() { docker ps -a --format '{{.Names}}' --filter "status=exited" ; } ;
