@@ -26,9 +26,14 @@ _quote_double() { sed 's/\(^\|$\)/"/g' ; } ;
 _dedup_sort() { sort "$@" | uniq ; };
 _dedup() { awk '!x[$0]++' ; } ;
 
-
+_oneline() { tr -d '\n' ; } ;
 
 #SYS
+
+## users/groups
+
+_file_gid_numeric() { stat -c %g "$@" ; } ;
+_file_uid_numeric() { stat -c %u "$@" ; } ;
 
 ##CHROOT
 
@@ -48,12 +53,15 @@ _mysql_optimize_all_tables() {
 
 ##DOCKER
 
+
 _docker_stats_json() {
   docker stats --no-stream --format "{\"container\":\"{{ .Container }}\",\"memory\":{\"raw\":\"{{ .MemUsage }}\",\"percent\":\"{{ .MemPerc }}\"},\"cpu\":\"{{ .CPUPerc }}\"}"  ; } ;
 
 
 _docker_stats_json_all() {
   docker stats --no-stream --format "{\"container\":\"{{ .Container }}\",\"memory\":{\"raw\":\"{{ .MemUsage }}\",\"percent\":\"{{ .MemPerc }}\"},\"cpu\":\"{{ .CPUPerc }}\"}" --all ; } ;
+
+_docker_stats_json_array() { _docker_stats_json "$@" |sed 's/$/,/g'| _oneline |sed 's/^/[/g;s/$/]/g'  ; } ;
 
 _docker_containers_all()    { docker ps -a --format '{{.Names}}' ; } ;
 _docker_containers_exited() { docker ps -a --format '{{.Names}}' --filter "status=exited" ; } ;
