@@ -138,6 +138,69 @@ _nslookup() {
 
 ### ↑↑ DNS ↑↑ ##
 
+## SSH ##
+#Props: https://superuser.com/questions/139310/how-can-i-tell-how-many-bits-my-ssh-key-is https://security.stackexchange.com/questions/42268/how-do-i-get-the-rsa-bit-length-with-the-pubkey-and-openssl https://serverfault.com/questions/325467/i-have-a-keypair-how-do-i-determine-the-key-length/325471
+_ssh_keylength() {  if [ -z "$1" ];then ssh-keygen -lf "$1"           ; 
+                    else           cat |ssh-keygen -lf /dev/stdin     ;
+                    fi
+                 }
+
+
+
+
+##GIT
+
+_git_commitpush() { git add -A ;git commit -m "$(date -u +%Y-%m-%d-%H.%M)"" $COMMITCOMMENT" ; git push ; } ;
+
+
+_git_autocommit() { echo -n;
+	sum=$(find ./ -type f -exec md5sum {} \;|grep -v ".git/" |md5sum);
+    echo "TESTING FOR GIT DIRECTORY IN" $(pwd);
+    test -d .git && ( while (true);do
+        sleep 8;
+        sum_cur=$(find ./ -type f -exec md5sum {} \;|grep -v ".git/" |md5sum);
+        if [ "$sum" == "$sum_cur" ] ; then
+            echo -ne "\rnothing changed@"$(date -u);
+        else
+            echo -ne "\rsmthing changed@"$(date -u)"  == "$(echo $sum_cur|head -c6)" >> cnt:(m:"$(git rev-list --count master)") (a:)"$(git rev-list --all --count)" ==>";
+            _git_commitpush 2>&1|grep -v "^To "|sed 's/^ create mode /+/g;s/^/|/g' |tr -d '\n' ; sum="$sum_cur";echo;
+            sync &
+                     fi;
+      done )
+ echo -n " "; } ;
+
+### HTML/CGI-bin
+
+
+_html_userinfo() {
+    echo '<div id="userinfo" class="userinfo">' ;
+    echo '<table id="userinfotable" class="userinfo"><tr>';
+    for param in SCRIPT_NAME SSL_PROTOCOL SSL_CIPHER_USEKEYSIZE SSL_CIPHER_ALGKEYSIZE HTTP_USER_AGENT GATEWAY_INTERFACE ; do echo '<th>'${param}' </th>' ; done
+    echo '</tr><tr>'
+    for param in SCRIPT_NAME SSL_PROTOCOL SSL_CIPHER_USEKEYSIZE SSL_CIPHER_ALGKEYSIZE HTTP_USER_AGENT GATEWAY_INTERFACE ; do echo '<td>'${!param}' </td>' ; done
+    echo '</tr></table>'
+    echo '</div>'   ; } ;
+
+
+htmlEscDec2Hex() {
+    file=$1
+    [ ! -r "$file" ] && file=$(mktemp) && cat >"$file"
+
+    printf -- \
+        "$(sed 's/\\/\\\\/g;s/%/%%/g;s/&#[0-9]\{1,10\};/\&#x%x;/g' "$file")\n" \
+        $(grep -o '&#[0-9]\{1,10\};' "$file" | tr -d '&#;')
+
+    [ x"$1" != x"$file" ] && rm -f -- "$file"
+}
+
+htmlHexUnescape() {
+    printf -- "$(
+        sed 's/\\/\\\\/g;s/%/%%/g
+            ;s/&#x\([0-9a-fA-F]\{1,8\}\);/\&#x0000000\1;/g
+            ;s/&#x0*\([0-9a-fA-F]\{4\}\);/\\u\1/g
+            ;s/&#x0*\([0-9a-fA-F]\{8\}\);/\\U\1/g' )\n"
+}
+
 
 ### VM
 
@@ -175,36 +238,3 @@ _virtualbox_snapshots_delete_interactive() { while (true);do
                                             echo "sleeping 2s ";sleep 2 ; done
                                             echo "Monitoring Process, press CTRL+C to quit"; tail -f  /tmp/vbox.snap.del.* ; } ;
 ##### ↑↑ VirtualBox ↑↑ ####
-
-##GIT
-
-_git_commitpush() { git add -A ;git commit -m "$(date -u +%Y-%m-%d-%H.%M)"" $COMMITCOMMENT" ; git push ; } ;
-
-
-_git_autocommit() { echo -n;
-	sum=$(find ./ -type f -exec md5sum {} \;|grep -v ".git/" |md5sum);
-    echo "TESTING FOR GIT DIRECTORY IN" $(pwd);
-    test -d .git && ( while (true);do
-        sleep 8;
-        sum_cur=$(find ./ -type f -exec md5sum {} \;|grep -v ".git/" |md5sum);
-        if [ "$sum" == "$sum_cur" ] ; then
-            echo -ne "\rnothing changed@"$(date -u);
-        else
-            echo -ne "\rsmthing changed@"$(date -u)"  == "$(echo $sum_cur|head -c6)" >> cnt:(m:"$(git rev-list --count master)") (a:)"$(git rev-list --all --count)" ==>";
-            _git_commitpush 2>&1|grep -v "^To "|sed 's/^ create mode /+/g;s/^/|/g' |tr -d '\n' ; sum="$sum_cur";echo;
-            sync &
-                     fi;
-      done )
- echo -n " "; } ;
-
-### HTML/CGI-bin
-
-
-_html_userinfo() {
-    echo '<div id="userinfo" class="userinfo">' ;
-    echo '<table id="userinfotable" class="userinfo"><tr>';
-    for param in SCRIPT_NAME SSL_PROTOCOL SSL_CIPHER_USEKEYSIZE SSL_CIPHER_ALGKEYSIZE HTTP_USER_AGENT GATEWAY_INTERFACE ; do echo '<th>'${param}' </th>' ; done
-    echo '</tr><tr>'
-    for param in SCRIPT_NAME SSL_PROTOCOL SSL_CIPHER_USEKEYSIZE SSL_CIPHER_ALGKEYSIZE HTTP_USER_AGENT GATEWAY_INTERFACE ; do echo '<td>'${!param}' </td>' ; done
-    echo '</tr></table>'
-    echo '</div>'   ; } ;
