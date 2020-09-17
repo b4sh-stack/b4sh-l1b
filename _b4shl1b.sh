@@ -182,24 +182,8 @@ _html_userinfo() {
     echo '</div>'   ; } ;
 
 
-htmlEscDec2Hex() {
-    file=$1
-    [ ! -r "$file" ] && file=$(mktemp) && cat >"$file"
-
-    printf -- \
-        "$(sed 's/\\/\\\\/g;s/%/%%/g;s/&#[0-9]\{1,10\};/\&#x%x;/g' "$file")\n" \
-        $(grep -o '&#[0-9]\{1,10\};' "$file" | tr -d '&#;')
-
-    [ x"$1" != x"$file" ] && rm -f -- "$file"
-}
-
-htmlHexUnescape() {
-    printf -- "$(
-        sed 's/\\/\\\\/g;s/%/%%/g
-            ;s/&#x\([0-9a-fA-F]\{1,8\}\);/\&#x0000000\1;/g
-            ;s/&#x0*\([0-9a-fA-F]\{4\}\);/\\u\1/g
-            ;s/&#x0*\([0-9a-fA-F]\{8\}\);/\\U\1/g' )\n"
-}
+# Props: https://stackoverflow.com/a/37840948
+_urldecode() { : "${*//+/ }"; echo -e "${_//%/\\x}"; }
 
 
 ### VM
