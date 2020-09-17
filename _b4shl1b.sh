@@ -55,11 +55,11 @@ _mysql_optimize_all_tables() {
 
 
 _docker_stats_json() {
-  docker stats --no-stream --format "{\"container\":\"{{ .Container }}\",\"name\":\"{{ .Names }}\",\"memory\":[{\"raw\":\"{{ .MemUsage }}\",\"percent\":\"{{ .MemPerc }}\"}],\"cpu\":\"{{ .CPUPerc }}\"}"  ; } ;
+  docker stats --no-stream --format "{\"container\":\"{{ .Container }}\",\"name\":\"{{ .Name }}\",\"memory\":[{\"raw\":\"{{ .MemUsage }}\",\"percent\":\"{{ .MemPerc }}\"}],\"cpu\":\"{{ .CPUPerc }}\"}"  ; } ;
 
 
 _docker_stats_json_all() {
-  docker stats --no-stream --format "{\"container\":\"{{ .Container }}\",\"name\":\"{{ .Names }}\",\"memory\":[{\"raw\":\"{{ .MemUsage }}\",\"percent\":\"{{ .MemPerc }}\"}],\"cpu\":\"{{ .CPUPerc }}\"}" --all ; } ;
+  docker stats --no-stream --format "{\"container\":\"{{ .Container }}\",\"name\":\"{{ .Name }}\",\"memory\":[{\"raw\":\"{{ .MemUsage }}\",\"percent\":\"{{ .MemPerc }}\"}],\"cpu\":\"{{ .CPUPerc }}\"}" --all ; } ;
 
 _docker_stats_json_array() { _docker_stats_json "$@" |sed 's/$/,/g'| _oneline |sed 's/^/[/g;s/,$/]/g'  ; } ;
 
