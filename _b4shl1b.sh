@@ -140,8 +140,8 @@ _nslookup() {
 
 ## SSH ##
 #Props: https://superuser.com/questions/139310/how-can-i-tell-how-many-bits-my-ssh-key-is https://security.stackexchange.com/questions/42268/how-do-i-get-the-rsa-bit-length-with-the-pubkey-and-openssl https://serverfault.com/questions/325467/i-have-a-keypair-how-do-i-determine-the-key-length/325471
-_ssh_keylength() {  if [ -z "$1" ];then ssh-keygen -lf "$1"           ; 
-                    else           cat |ssh-keygen -lf /dev/stdin     ;
+_ssh_keylength() {  if [ $# -eq 0 ];then  cat |ssh-keygen -lf /dev/stdin  |cut -d" " -f1|cut -f1   ;
+                    else                       ssh-keygen -lf "$1"        |cut -d" " -f1|cut -f1   ; 
                     fi
                  }
 
@@ -200,7 +200,7 @@ _virtualbox_stop_all() { vboxmanage list vms|cut -d"{" -f2|cut -d"}" -f1|while r
 
 
 _virtualbox_snapshots_list_all() { vboxmanage list vms|cut -d\" -f2 |sed 's/\t//g'|while read virmach ;do
-                                  vboxmanage showvminfo "$virmach"|grep -e Snapshots: -e Name:|sed 's/^/\t|\t\t/g'|while read line;do echo "${virmach}${line}";done ;
+                                  vboxmanage showvminfo "${virmach}"|grep -e Snapshots: -e Name:|sed 's/^/\t|\t\t/g'|while read line;do echo "${virmach}${line}";done ;
                                   for dot in {1..80};do echo -n ".";done;echo  ;done ; } ;
 
 
@@ -211,7 +211,7 @@ _virtualbox_snapshots_create_allmachines_online() {
    vboxmanage list vms|cut -d\" -f2 |while read virmach ;do
        echo "backing up "${virmach}"... stay calm and ignore the percentage ( it IS slow around 90 percent, thats not an error) :) ";
        echo "name:"${SNAPSHOT_ID};
-       vboxmanage snapshot "${virmach}" take "$SNAPSHOT_ID" --description "$SNAPSHOT_DESCRIPTION";done ; } ;
+       vboxmanage snapshot "${virmach}" take "${SNAPSHOT_ID}" --description "${SNAPSHOT_DESCRIPTION}";done ; } ;
 
 _virtualbox_snapshots_delete_interactive() { while (true);do
                                             echo "SNAPSHOT SINGLE DELETTION.."
