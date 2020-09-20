@@ -30,6 +30,11 @@ _oneline() { tr -d '\n' ; } ;
 
 #SYS
 
+#file age
+_fileage_sec_stat() {
+           test -e "$1" && ( echo $(($(date -u +%s)-$(TZ=utc stat -c %Y "$1"))) ) ||  echo "$(date -u +%s)" ;
+           } ;
+
 ## users/groups
 
 _file_gid_numeric() { stat -c %g "$@" ; } ;
@@ -72,7 +77,8 @@ _docker_containers_exited() { docker ps -a --format '{{.Names}}' --filter "statu
 
 ## IPv6
 
-is_ipv6() { target=$1; if [ "$(echo -n $target|tr -cd 'abcdef1234567890:'|wc -c)" -eq "$(echo -n $target|wc -c)" ] ; then return 1;else return 0;fi } ;
+#is_ipv6                     ###########check syntax, string length of allowed chars must match original string
+_is_ipv6() { target=$1; if [ "$(echo -n $target|tr -cd 'abcdef1234567890:'|wc -c)" -eq "$(echo -n $target|wc -c)" ] ; then return 1;else return 0;fi } ;
 
 
 ### ↓↓ DNS ↓↓ ##
@@ -101,7 +107,7 @@ _nslookup_ptr() {            #1 target          #2 nameserver
                   target="";query="-query=PTR";namesrv="";
                   if [ -z "$1" ]; then return 666; else target="$1" ;fi #no target no fun
                   if [ ! -z "$2" ];then namesrv="$2";fi
-                  is_ipv6 "$target"
+                  _is_ipv6 "$target"
                   IPV6_RETURN_CODE=$?
                   if [ "$IPV6_RETURN_CODE" -eq "1" ] ; ## have ipv6 ,length of string matches a string having same length
                     then
@@ -141,7 +147,7 @@ _nslookup() {
 ## SSH ##
 #Props: https://superuser.com/questions/139310/how-can-i-tell-how-many-bits-my-ssh-key-is https://security.stackexchange.com/questions/42268/how-do-i-get-the-rsa-bit-length-with-the-pubkey-and-openssl https://serverfault.com/questions/325467/i-have-a-keypair-how-do-i-determine-the-key-length/325471
 _ssh_keylength() {  if [ $# -eq 0 ];then  cat |ssh-keygen -lf /dev/stdin  |cut -d" " -f1|cut -f1   ;
-                    else                       ssh-keygen -lf "$1"        |cut -d" " -f1|cut -f1   ; 
+                    else                       ssh-keygen -lf "$1"        |cut -d" " -f1|cut -f1   ;
                     fi
                  }
 
