@@ -28,10 +28,18 @@ _dedup() { awk '!x[$0]++' ; } ;
 
 _oneline() { tr -d '\n' ; } ;
 
+
+_reformat_docker_purge() { sed 's/^deleted: .\+:\([[:alnum:]].\{2\}\).\+\([[:alnum:]].\{2\}\)/\1..\2|/g;s/^\(.\)[[:alnum:]].\{61\}\(.\)/\1.\2|/g' |tr -d '\n' ; } ;
+
+## Colors ;
+uncolored="\033[0m" ; black="\033[0;30m" ; blackb="\033[1;30m" ; white="\033[0;37m" ; whiteb="\033[1;37m" ; red="\033[0;31m" ; redb="\033[1;31m" ; green="\033[0;32m" ; greenb="\033[1;93m" ; yellow="\033[0;33m" ; yellowb="\033[1;33m" ; blue="\033[0;34m" ; blueb="\033[1;34m" ; purple="\033[0;35m" ; purpleb="\033[1;35m" ; lightblue="\033[0;36m" ; lightblueb="\033[1;36m" ;  function black {   echo -en "${black}${1}${uncolored}" ; } ;    function blackb {   echo -en "${blackb}";cat;echo -en "${uncolored}" ; } ;   function white {   echo -en "${white}";cat;echo -en "${uncolored}" ; } ;   function whiteb {   echo -en "${whiteb}";cat;echo -en "${uncolored}" ; } ;   function red {   echo -en "${red}";cat;echo -en "${uncolored}" ; } ;   function redb {   echo -en "${redb}";cat;echo -en "${uncolored}" ; } ;   function green {   echo -en "${green}";cat;echo -en "${uncolored}" ; } ;   function greenb {   echo -en "${greenb}";cat;echo -en "${uncolored}" ; } ;   function yellow {   echo -en "${yellow}";cat;echo -en "${uncolored}" ; } ;   function yellowb {   echo -en "${yellowb}";cat;echo -en "${uncolored}" ; } ;   function blue {   echo -en "${blue}";cat;echo -en "${uncolored}" ; } ;   function blueb {   echo -en "${blueb}";cat;echo -en "${uncolored}" ; } ;   function purple {   echo -en "${purple}";cat;echo -en "${uncolored}" ; } ;   function purpleb {   echo -en "${purpleb}";cat;echo -en "${uncolored}" ; } ;   function lightblue {   echo -en "${lightblue}";cat;echo -en "${uncolored}" ; } ;   function lightblueb {   echo -en "${lightblueb}";cat;echo -en "${uncolored}" ; } ;  function echo_black {   echo -en "${black}${1}${uncolored}" ; } ; function echo_blackb {   echo -en "${blackb}${1}${uncolored}" ; } ;   function echo_white {   echo -en "${white}${1}${uncolored}" ; } ;   function echo_whiteb {   echo -en "${whiteb}${1}${uncolored}" ; } ;   function echo_red {   echo -en "${red}${1}${uncolored}" ; } ;   function echo_redb {   echo -en "${redb}${1}${uncolored}" ; } ;   function echo_green {   echo -en "${green}${1}${uncolored}" ; } ;   function echo_greenb {   echo -en "${greenb}${1}${uncolored}" ; } ;   function echo_yellow {   echo -en "${yellow}${1}${uncolored}" ; } ;   function echo_yellowb {   echo -en "${yellowb}${1}${uncolored}" ; } ;   function echo_blue {   echo -en "${blue}${1}${uncolored}" ; } ;   function echo_blueb {   echo -en "${blueb}${1}${uncolored}" ; } ;   function echo_purple {   echo -en "${purple}${1}${uncolored}" ; } ;   function echo_purpleb {   echo -en "${purpleb}${1}${uncolored}" ; } ;   function echo_lightblue {   echo -en "${lightblue}${1}${uncolored}" ; } ;   function echo_lightblueb {   echo -en "${lightblueb}${1}${uncolored}" ; } ;    function colors_list {   echo_black "black";   echo_blackb "blackb";   echo_white "white";   echo_whiteb "whiteb";   echo_red "red";   echo_redb "redb";   echo_green "green";   echo_greenb "greenb";   echo_yellow "yellow";   echo_yellowb "yellowb";   echo_blue "blue";   echo_blueb "blueb";   echo_purple "purple";   echo_purpleb "purpleb";   echo_lightblue "lightblue";   echo_lightblueb "lightblueb"; } ;
+
 #SYS
 
+_clock() { echo -n WALLCLOCK : |redb ;echo  $( date -u "+%F %T" ) |yellow ; } ;
+
 #file age
-_fileage_sec_stat() {
+_fileage_sec_stat() {  ## returns file age in seconds or 1970-01-01  ## meant for caching
            test -e "$1" && ( echo $(($(date -u +%s)-$(TZ=utc stat -c %Y "$1"))) ) ||  echo "$(date -u +%s)" ;
            } ;
 
@@ -75,11 +83,25 @@ _docker_containers_exited() { docker ps -a --format '{{.Names}}' --filter "statu
 
 ## IPV4
 
+_ipv4_all_public_ips() { ## get system ipv4's in public range , check for argument as source , no argeuments gets it from /proc/net/fib_trie
+  if [ -z "$1" ];then
+      awk '/32 host/ { print f } {f=$2}' <<< "$(</proc/net/fib_trie)"|grep -v -e ^192\.168 -e ^10\. -e ^127\. -e 172\.16 -e 172\.17 -e 172\.18 -e 172\.19 -e 172\.20 -e 172\.21 -e 172\.22 -e 172\.23 -e 172\.24 -e 172\.25 -e 172\.26 -e 172\.27 -e 172\.28 -e 172\.29 -e 172\.30 -e 172\.31 -e 172\.32 -e 169.254 |awk '!x[$0]++'
+  else
+     test -f "$1" &&   awk '/32 host/ { print f } {f=$2}' <<< "$(<$1)"|grep -v -e ^192\.168 -e ^10\. -e ^127\. -e 172\.16 -e 172\.17 -e 172\.18 -e 172\.19 -e 172\.20 -e 172\.21 -e 172\.22 -e 172\.23 -e 172\.24 -e 172\.25 -e 172\.26 -e 172\.27 -e 172\.28 -e 172\.29 -e 172\.30 -e 172\.31 -e 172\.32 -e 169.254 |awk '!x[$0]++'
+  fi   ; } ;
+
 ## IPv6
 
 #is_ipv6                     ###########check syntax, string length of allowed chars must match original string
 _is_ipv6() { target=$1; if [ "$(echo -n $target|tr -cd 'abcdef1234567890:'|wc -c)" -eq "$(echo -n $target|wc -c)" ] ; then return 1;else return 0;fi } ;
 
+_ipv6_all_public_ips() { ## get system ipv6's in public range , check for argument as source , no argeuments gets it from /proc/net/if_inet6
+  for i in "$(grep /proc/net/if_inet6 -v -e lo$ -e ^fe80  )"; do     echo "$i" | gawk '@include "join"
+    {
+        split($1, _, "[0-9a-f]{,4}", seps)
+        print join(seps, 1, length(seps), ":")
+    }'; done
+  }
 
 ### ↓↓ DNS ↓↓ ##
 
