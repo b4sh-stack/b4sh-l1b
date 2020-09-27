@@ -227,44 +227,49 @@ _virtualbox_stop_all() { vboxmanage list vms|cut -d"{" -f2|cut -d"}" -f1|while r
 
 
 
-_virtualbox_snapshots_list_all() { vboxmanage list vms|cut -d\" -f2 |sed 's/\t//g'|while read virmach ;do
-                                  vboxmanage showvminfo "${virmach}"|grep -e Snapshots: -e Name:|sed 's/^/\t|\t\t/g'|while read line;do echo "${virmach}${line}";done ;
-                                  for dot in {1..80};do echo -n ".";done;echo  ;done ; } ;
+_virtualbox_snapshots_list_all() {
+    vboxmanage list vms|cut -d\" -f2 |sed 's/\t//g'|while read virmach ;do
+      vboxmanage showvminfo "${virmach}"|grep -e Snapshots: -e Name:|sed 's/^/\t|\t\t/g'|while read line;do echo "${virmach}${line}";done ;
+      for dot in {1..80};do echo -n ".";done;echo  ;done ; } ;
 
-_vbox_snapshot_delete_prompter() {  while (true);do echo "Virtualbox VM SNAPSHOT DELETION"
-                                                        echo "VM=";read virmach;
-                                                        echo "SNAP-UUID=";read virsnap;
-                                                        echo "deleting in background , log in /tmp/vbox.snap.del."${virmach}.${virsnap} ;
-                                                        vboxmanage snapshot $virmach delete $virsnap &> /tmp/vbox.snap.del.${virmach}.${virsnap} &
-                                                    echo "sleeping 2s , press CTRL+C to exit";sleep 2 ; echo
-                                                    done ; } ;
+_virtualbox_snapshot_delete_prompter() {
+    while (true);do echo "Virtualbox VM SNAPSHOT DELETION"
+        echo "VM=";read virmach;
+        echo "SNAP-UUID=";read virsnap;
+        echo "deleting in background , log in /tmp/vbox.snap.del."${virmach}.${virsnap} ;
+        vboxmanage snapshot $virmach delete $virsnap &> /tmp/vbox.snap.del.${virmach}.${virsnap} &
+        echo "sleeping 2s , press CTRL+C to exit";sleep 2 ; echo
+    done ; } ;
 
-_vbox_snapshot_auto_create_all() { ### pulling in env before to have empty values in the outer shell before if
-                                   MY_SNAPSHOT_ID="${SNAPSHOT_ID}";
-                                   MY_SNAPSHOT_DESCRIPTION="${SNAPSHOT_DESCRIPTION}";
-                                    if [ -z "$MY_SNAPSHOT_ID" ];then echo SNAPSHOT_ID NOT SET, using time ;MY_SNAPSHOT_ID=$(date -u +%Y-%m-%d_%H.%M );fi
-                                    if [ -z "$MY_SNAPSHOT_DESCRIPTION" ];then echo SNAPSHOT_DESCRIPTION, using auto;MY_SNAPSHOT_DESCRIPTION="Auto Generated"$( date -u +%Y-%m-%d_%H.%M );fi
-                                     vboxmanage list vms|cut -d'"' -f2 |while read virmach ;do
-                                                echo "backing up "${virmach}"... stay calm and ignore the percentage :) name:"${MY_SNAPSHOT_ID};
-                                                vboxmanage snapshot "${virmach}" take "$MY_SNAPSHOT_ID" --description "$MY_SNAPSHOT_DESCRIPTION"; 
-                                                done  ; } ;
+_virtualbox_snapshot_create_auto_all() { ### pulling in env before to have empty values in the outer shell before if
+    MY_SNAPSHOT_ID="${SNAPSHOT_ID}";
+    MY_SNAPSHOT_DESCRIPTION="${SNAPSHOT_DESCRIPTION}";
+    if [ -z "$MY_SNAPSHOT_ID" ];then echo SNAPSHOT_ID NOT SET, using time ;MY_SNAPSHOT_ID=$(date -u +%Y-%m-%d_%H.%M );fi
+    if [ -z "$MY_SNAPSHOT_DESCRIPTION" ];then echo SNAPSHOT_DESCRIPTION, using auto;MY_SNAPSHOT_DESCRIPTION="Auto Generated"$( date -u +%Y-%m-%d_%H.%M );fi
+    vboxmanage list vms|cut -d'"' -f2 |while read virmach ;do
+        echo "backing up "${virmach}"... stay calm and ignore the percentage :) name:"${MY_SNAPSHOT_ID};
+        vboxmanage snapshot "${virmach}" take "$MY_SNAPSHOT_ID" --description "$MY_SNAPSHOT_DESCRIPTION";
+    done  ; } ;
 
 
-_virtualbox_snapshots_create_allmachines_online() {
-   SNAPSHOT_NAME="YourNameHere"
-   SNAPSHOT_ID=$(date -u +%Y-%m-%d_%H.%M)"-$SNAPSHOT_NAME"
-   SNAPSHOT_DESCRIPTION="YourCommentHere"
-   vboxmanage list vms|cut -d\" -f2 |while read virmach ;do
+_virtualbox_snapshot_create_allmachines_online() {
+    SNAPSHOT_NAME="YourNameHere"
+    SNAPSHOT_ID=$(date -u +%Y-%m-%d_%H.%M)"-$SNAPSHOT_NAME"
+    SNAPSHOT_DESCRIPTION="YourCommentHere"
+    vboxmanage list vms|cut -d\" -f2 |while read virmach ;do
        echo "backing up "${virmach}"... stay calm and ignore the percentage ( it IS slow around 90 percent, thats not an error) :) ";
        echo "name:"${SNAPSHOT_ID};
        vboxmanage snapshot "${virmach}" take "${SNAPSHOT_ID}" --description "${SNAPSHOT_DESCRIPTION}";done ; } ;
 
 _virtualbox_snapshots_delete_interactive() { while (true);do
-                                            echo "SNAPSHOT SINGLE DELETTION.."
-                                            echo "VM=";read virmach;
-                                            echo "SNAP-UUID=";read virsnap;
-                                            echo "deleting in background , log in /tmp/vbox.snap.del.${virmach}.${virsnap}" ;
-                                            vboxmanage snapshot "${virmach}" delete "${virsnap}" &> "/tmp/vbox.snap.del.${virmach}.${virsnap}" &
-                                            echo "sleeping 2s ";sleep 2 ; done
-                                            echo "Monitoring Process, press CTRL+C to quit"; tail -f  /tmp/vbox.snap.del.* ; } ;
+
+    echo "SNAPSHOT SINGLE DELETTION.."
+
+    echo "VM=";read virmach;
+    echo "SNAP-UUID=";read virsnap;
+    echo "deleting in background , log in /tmp/vbox.snap.del.${virmach}.${virsnap}" ;
+    vboxmanage snapshot "${virmach}" delete "${virsnap}" &> "/tmp/vbox.snap.del.${virmach}.${virsnap}" &
+    echo "sleeping 2s ";sleep 2 ; done
+##    echo "Monitoring Process, press CTRL+C to quit"; tail -f  /tmp/vbox.snap.del.* ;
+    } ;
 ##### ↑↑ VirtualBox ↑↑ ####
