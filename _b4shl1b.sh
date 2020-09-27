@@ -261,7 +261,7 @@ _virtualbox_snapshot_create_allmachines_online() {
        echo "name:"${SNAPSHOT_ID};
        vboxmanage snapshot "${virmach}" take "${SNAPSHOT_ID}" --description "${SNAPSHOT_DESCRIPTION}";done ; } ;
 
-_virtualbox_snapshots_delete_interactive() { while (true);do
+_virtualbox_snapshot_delete_interactive() { while (true);do
 
     echo "SNAPSHOT SINGLE DELETTION.."
 
