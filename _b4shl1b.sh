@@ -227,7 +227,7 @@ _virtualbox_stop_all() { vboxmanage list vms|cut -d"{" -f2|cut -d"}" -f1|while r
 
 
 
-_virtualbox_snapshots_list_all() {
+_virtualbox_snapshot_list_all() {
     vboxmanage list vms|cut -d\" -f2 |sed 's/\t//g'|grep -v  -e '<inaccessible>'|while read virmach ;do
       vboxmanage showvminfo "${virmach}"|grep -e Snapshots: -e Name:|sed 's/^/\t|\t\t/g'|while read line;do echo "${virmach}${line}";done ;
       for dot in {1..80};do echo -n ".";done;echo  ;done ; } ;
