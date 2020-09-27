@@ -235,7 +235,8 @@ _virtualbox_snapshot_list_all() {
 _virtualbox_snapshot_delete_prompter() {
     while (true);do echo "Virtualbox VM SNAPSHOT DELETION"
         echo "SNAPSHOT SINGLE DELETTION.."
-        echo "VM=";read virmach;
+        echo -n "VM= ";read virmach;
+        echo "(listing:)"
         vboxmanage showvminfo "${virmach}"|grep -e Snapshots: -e Name:|sed 's/^/\t|\t\t/g'|while read line;do echo "${virmach}${line}";done ;
         echo "SNAP-UUID=";read virsnap;
         echo "deleting in background , log in /tmp/vbox.snap.del."${virmach// /}.${virsnap// /}.log ;
