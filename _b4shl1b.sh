@@ -238,7 +238,7 @@ _virtualbox_snapshot_delete_prompter() {
         echo "VM=";read virmach;
         echo "SNAP-UUID=";read virsnap;
         echo "deleting in background , log in /tmp/vbox.snap.del."${virmach}.${virsnap} ;
-        vboxmanage snapshot $virmach delete $virsnap 2>&1 >/tmp/vbox.snap.del.${virmach}.${virsnap} &
+        vboxmanage snapshot $virmach delete $virsnap 2>&1 |tee  "/tmp/vbox.snap.del.${virmach}.${virsnap}" >/dev/null &
         echo "sleeping 2s , press CTRL+C to exit";sleep 2 ; echo
     done ; } ;
 
