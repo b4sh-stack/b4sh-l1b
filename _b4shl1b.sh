@@ -234,12 +234,15 @@ _virtualbox_snapshot_list_all() {
 
 _virtualbox_snapshot_delete_prompter() {
     while (true);do echo "Virtualbox VM SNAPSHOT DELETION"
+        echo "SNAPSHOT SINGLE DELETTION.."
         echo "VM=";read virmach;
         echo "SNAP-UUID=";read virsnap;
         echo "deleting in background , log in /tmp/vbox.snap.del."${virmach}.${virsnap} ;
-        vboxmanage snapshot $virmach delete $virsnap &> /tmp/vbox.snap.del.${virmach}.${virsnap} &
+        vboxmanage snapshot $virmach delete $virsnap 2>&1 >/tmp/vbox.snap.del.${virmach}.${virsnap} &
         echo "sleeping 2s , press CTRL+C to exit";sleep 2 ; echo
     done ; } ;
+
+_virtualbox_snapshot_delete_interactive() { _virtualbox_snapshot_delete_prompter "$@" ; } ;
 
 _virtualbox_snapshot_create_auto_all() { ### pulling in env before to have empty values in the outer shell before if
     MY_SNAPSHOT_ID="${SNAPSHOT_ID}";
