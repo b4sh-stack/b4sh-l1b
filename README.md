@@ -2,9 +2,10 @@
 
 b4sh-l1b [ aka bash-library ]
 
-is a do-on-any-device library targeted for POSIX / System V / linux / openwrt / alpine
+is a **do-on-any-device shell library** targeted for:
+ `POSIX / System V / generic-linux / openwrt / alpine linux `
 
-shell library to circumvent common restrictions like not having base64 but awk binary
+to circumvent common restrictions like not having `base64` but `awk` binary
 
 
 ---
