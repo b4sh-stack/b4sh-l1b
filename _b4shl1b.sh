@@ -1,10 +1,79 @@
 #!/bin/sh
+# @file b4sh-l1b aka bash-lib aka bash library
+# @brief A library that solves some common problems and redefiines missing functions.
+# @description
+#     repository url: https://gitlab.com/b4sh-stack/b4sh-l1b/
+#     Many common situations end soon on systems that are not GNU/UNIX compatible
+#     e.g. busybox is lacking many functions like tac / rev , even iproute standards like tun are mising in default openwrt builds 
+#
+#     The project solves lots of problems:
+#      * missing tools like **tac** , **nl**, **rev** are defined
+#      * deduplication of STDIN 
+#      * timestamps in nanosecond even when host does not provide it(openwrt/busybox)
+#      * docker functions
+#      * git tools for automatic pushing/committing
+#      * ipv4/ipv6 checks
+#      * etc
+#
+#      References: http://sed.sourceforge.net/local/docs/emulating_unix.txt https://edoras.sdsu.edu/doc/sed-oneliners.html  https://unix.stackexchange.com/questions/9356/how-can-i-print-lines-from-file-backwards-without-using-tac https://www.geeksforgeeks.org/reverse-a-string-shell-programming/ https://www.unix.com/shell-programming-and-scripting/223077-awk-reverse-string.html https://thomas-cokelaer.info/blog/2018/01/awk-convert-into-lower-or-upper-cases/
+############################
+
 
 #declare -r TRUE=0
 #declare -r FALSE=1
 
-##busybox is lacking many functions like tac / rev , even iproute standards like tun are mising in default openwrt builds
-## http://sed.sourceforge.net/local/docs/emulating_unix.txt https://edoras.sdsu.edu/doc/sed-oneliners.html  https://unix.stackexchange.com/questions/9356/how-can-i-print-lines-from-file-backwards-without-using-tac https://www.geeksforgeeks.org/reverse-a-string-shell-programming/ https://www.unix.com/shell-programming-and-scripting/223077-awk-reverse-string.html https://thomas-cokelaer.info/blog/2018/01/awk-convert-into-lower-or-upper-cases/
+#### DOCUMENTATION PART: EMPTY FUNCTIONS ONLY FOR shdoc parser
+
+# @description wrap a string in single quotes
+#
+# @example
+#    echo some string |_quote_single
+#
+# @see _quote_double()
+_quote_single() {  true ; } ;
+
+# @description wrap a string in double quotes
+#
+# @example
+#    echo some string |_quote_double
+#
+# @see _quote_single()
+_quote_double() {  true ; } ;
+
+# @description sort and deduplicate file or STDIN
+#
+# @arg $@ filename one or multiple files to sort
+#
+# @example
+#    cat /tmp/anyfile|_dedup_sort
+#    _dedup_sort /tmp/file1 /tmp/file2
+# @stdout a sorted and deduplicated result will be printed to STDOUT
+# @see _dedup()
+_dedup_sort() {  true ; } ;
+
+# @description deduplicate STDIN
+#
+# @arg $@ this function has no arguments
+#
+# @example
+#    cat /tmp/anyfile|_dedup_sort
+# @stdout a deduplicated result will be printed to STDOUT
+# @see _dedup_sort()
+_dedup() {  true ; } ;
+
+# @description remove newlines from STDIN
+#
+# @arg $@ this function has no arguments
+#
+# @example
+#    cat /tmp/anyfile|_dedup_sort
+# @stdout a deduplicated result will be printed to STDOUT
+# @see _dedup_sort()
+_oneline() {  true ; } ;
+
+
+
+## 
 
 ### REDEFINE MISSING FUNCTIONS
 
@@ -23,18 +92,18 @@ timestamp_nanos() { if [[ $(date +%s%N |wc -c) -eq 20  ]]; then date -u +%s%N;el
 _quote_single() { sed "s/\(^\|$\)/'/g" ; } ;
 _quote_double() { sed 's/\(^\|$\)/"/g' ; } ;
 
+
 _dedup_sort() { sort "$@" | uniq ; };
+
 _dedup() { awk '!x[$0]++' ; } ;
 
 _oneline() { tr -d '\n' ; } ;
 
 
-_reformat_docker_purge() { sed 's/^deleted: .\+:\([[:alnum:]].\{2\}\).\+\([[:alnum:]].\{2\}\)/\1..\2|/g;s/^\(.\)[[:alnum:]].\{61\}\(.\)/\1.\2|/g' |tr -d '\n' ; } ;
-
 ## Colors ;
 uncolored="\033[0m" ; black="\033[0;30m" ; blackb="\033[1;30m" ; white="\033[0;37m" ; whiteb="\033[1;37m" ; red="\033[0;31m" ; redb="\033[1;31m" ; green="\033[0;32m" ; greenb="\033[1;93m" ; yellow="\033[0;33m" ; yellowb="\033[1;33m" ; blue="\033[0;34m" ; blueb="\033[1;34m" ; purple="\033[0;35m" ; purpleb="\033[1;35m" ; lightblue="\033[0;36m" ; lightblueb="\033[1;36m" ;  function black {   echo -en "${black}${1}${uncolored}" ; } ;    function blackb {   echo -en "${blackb}";cat;echo -en "${uncolored}" ; } ;   function white {   echo -en "${white}";cat;echo -en "${uncolored}" ; } ;   function whiteb {   echo -en "${whiteb}";cat;echo -en "${uncolored}" ; } ;   function red {   echo -en "${red}";cat;echo -en "${uncolored}" ; } ;   function redb {   echo -en "${redb}";cat;echo -en "${uncolored}" ; } ;   function green {   echo -en "${green}";cat;echo -en "${uncolored}" ; } ;   function greenb {   echo -en "${greenb}";cat;echo -en "${uncolored}" ; } ;   function yellow {   echo -en "${yellow}";cat;echo -en "${uncolored}" ; } ;   function yellowb {   echo -en "${yellowb}";cat;echo -en "${uncolored}" ; } ;   function blue {   echo -en "${blue}";cat;echo -en "${uncolored}" ; } ;   function blueb {   echo -en "${blueb}";cat;echo -en "${uncolored}" ; } ;   function purple {   echo -en "${purple}";cat;echo -en "${uncolored}" ; } ;   function purpleb {   echo -en "${purpleb}";cat;echo -en "${uncolored}" ; } ;   function lightblue {   echo -en "${lightblue}";cat;echo -en "${uncolored}" ; } ;   function lightblueb {   echo -en "${lightblueb}";cat;echo -en "${uncolored}" ; } ;  function echo_black {   echo -en "${black}${1}${uncolored}" ; } ; function echo_blackb {   echo -en "${blackb}${1}${uncolored}" ; } ;   function echo_white {   echo -en "${white}${1}${uncolored}" ; } ;   function echo_whiteb {   echo -en "${whiteb}${1}${uncolored}" ; } ;   function echo_red {   echo -en "${red}${1}${uncolored}" ; } ;   function echo_redb {   echo -en "${redb}${1}${uncolored}" ; } ;   function echo_green {   echo -en "${green}${1}${uncolored}" ; } ;   function echo_greenb {   echo -en "${greenb}${1}${uncolored}" ; } ;   function echo_yellow {   echo -en "${yellow}${1}${uncolored}" ; } ;   function echo_yellowb {   echo -en "${yellowb}${1}${uncolored}" ; } ;   function echo_blue {   echo -en "${blue}${1}${uncolored}" ; } ;   function echo_blueb {   echo -en "${blueb}${1}${uncolored}" ; } ;   function echo_purple {   echo -en "${purple}${1}${uncolored}" ; } ;   function echo_purpleb {   echo -en "${purpleb}${1}${uncolored}" ; } ;   function echo_lightblue {   echo -en "${lightblue}${1}${uncolored}" ; } ;   function echo_lightblueb {   echo -en "${lightblueb}${1}${uncolored}" ; } ;    function colors_list {   echo_black "black";   echo_blackb "blackb";   echo_white "white";   echo_whiteb "whiteb";   echo_red "red";   echo_redb "redb";   echo_green "green";   echo_greenb "greenb";   echo_yellow "yellow";   echo_yellowb "yellowb";   echo_blue "blue";   echo_blueb "blueb";   echo_purple "purple";   echo_purpleb "purpleb";   echo_lightblue "lightblue";   echo_lightblueb "lightblueb"; } ;
 
-#SYS
+## SYS
 
 _clock() { echo -n WALLCLOCK : |redb ;echo  $( date -u "+%F %T" ) |yellow ; } ;
 
@@ -48,7 +117,7 @@ _fileage_sec_stat() {  ## returns file age in seconds or 1970-01-01  ## meant fo
 _file_gid_numeric() { stat -c %g "$@" ; } ;
 _file_uid_numeric() { stat -c %u "$@" ; } ;
 
-##CHROOT
+## CHROOT
 
 _chroot_mount() {
     CHR_TARGET=$1
@@ -64,7 +133,10 @@ _mysql_optimize_all_tables() {
   mysql -e "show tables"  $DBNAME|cat|while read table ;do mysql -e "OPTIMIZE TABLE $table" "$DBNAME" ;done
   echo ; } ;
 
-##DOCKER
+## DOCKER
+
+
+_reformat_docker_purge() { sed 's/^deleted: .\+:\([[:alnum:]].\{2\}\).\+\([[:alnum:]].\{2\}\)/\1..\2|/g;s/^\(.\)[[:alnum:]].\{61\}\(.\)/\1.\2|/g' |tr -d '\n' ; } ;
 
 
 _docker_stats_json() {
@@ -236,11 +308,10 @@ _virtualbox_snapshot_delete_prompter() {
     while (true);do echo "Virtualbox VM SNAPSHOT DELETION"
         echo "SNAPSHOT SINGLE DELETTION.."
         echo -n "VM= ";read virmach;
-        echo "(listing:)"
-        vboxmanage showvminfo "${virmach}"|grep -e Snapshots: -e Name:|sed 's/^/\t|\t\t/g'|while read line;do echo "${virmach}${line}";done ;
+          echo "(listing:)"; vboxmanage showvminfo "${virmach}"|grep -e Snapshots: -e Name:|sed 's/^/\t|\t\t/g'|while read line;do echo "${virmach}${line}";done ;
         echo "SNAP-UUID=";read virsnap;
         echo "deleting in background , log in /tmp/vbox.snap.del."${virmach// /}.${virsnap// /}.log ;
-        vboxmanage snapshot "${virmach}" delete "${virsnap}"  &> /tmp/vbox.snap.del.${virmach// /}.${virsnap// /}.log &
+        ( vboxmanage snapshot "${virmach}" delete "${virsnap}"  &> /tmp/vbox.snap.del.${virmach// /}.${virsnap// /}.log & ) 
         echo "sleeping 2s , press CTRL+C to exit";sleep 2 ; echo
     done ; } ;
 
@@ -274,7 +345,7 @@ _virtualbox_snapshot_delete_interactive() { while (true);do
     echo "SNAP-UUID=";read virsnap;
     echo "deleting in background , log in /tmp/vbox.snap.del.${virmach}.${virsnap}" ;
     vboxmanage snapshot "${virmach}" delete "${virsnap}" &> "/tmp/vbox.snap.del.${virmach}.${virsnap}" &
-    echo "sleeping 2s ";sleep 2 ; done
+    echo "sleeping 2s, press CTRL+C to quit ";sleep 2 ; done
 ##    echo "Monitoring Process, press CTRL+C to quit"; tail -f  /tmp/vbox.snap.del.* ;
     } ;
 ##### ↑↑ VirtualBox ↑↑ ####
