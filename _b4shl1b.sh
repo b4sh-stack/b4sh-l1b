@@ -3,6 +3,7 @@
 # @brief A library that solves some common problems and redefiines missing functions.
 # @description
 #     repository url: https://gitlab.com/b4sh-stack/b4sh-l1b/
+#
 #     Many common situations end soon on systems that are not GNU/UNIX compatible
 #     e.g. busybox is lacking many functions like tac / rev , even iproute standards like tun are mising in default openwrt builds 
 #
@@ -16,7 +17,7 @@
 #      * etc
 #
 #      References: http://sed.sourceforge.net/local/docs/emulating_unix.txt https://edoras.sdsu.edu/doc/sed-oneliners.html  https://unix.stackexchange.com/questions/9356/how-can-i-print-lines-from-file-backwards-without-using-tac https://www.geeksforgeeks.org/reverse-a-string-shell-programming/ https://www.unix.com/shell-programming-and-scripting/223077-awk-reverse-string.html https://thomas-cokelaer.info/blog/2018/01/awk-convert-into-lower-or-upper-cases/
-############################
+#
 
 
 #declare -r TRUE=0
