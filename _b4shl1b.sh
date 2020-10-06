@@ -16,7 +16,13 @@
 #      * ipv4/ipv6 checks
 #      * etc
 #
-#      References: http://sed.sourceforge.net/local/docs/emulating_unix.txt https://edoras.sdsu.edu/doc/sed-oneliners.html  https://unix.stackexchange.com/questions/9356/how-can-i-print-lines-from-file-backwards-without-using-tac https://www.geeksforgeeks.org/reverse-a-string-shell-programming/ https://www.unix.com/shell-programming-and-scripting/223077-awk-reverse-string.html https://thomas-cokelaer.info/blog/2018/01/awk-convert-into-lower-or-upper-cases/
+#     References: 
+#      * http://sed.sourceforge.net/local/docs/emulating_unix.txt 
+#      * https://edoras.sdsu.edu/doc/sed-oneliners.html  
+#      * https://unix.stackexchange.com/questions/9356/how-can-i-print-lines-from-file-backwards-without-using-tac 
+#      * https://www.geeksforgeeks.org/reverse-a-string-shell-programming/ 
+#      * https://www.unix.com/shell-programming-and-scripting/223077-awk-reverse-string.html 
+#      * https://thomas-cokelaer.info/blog/2018/01/awk-convert-into-lower-or-upper-cases/
 #
 
 
