@@ -48,6 +48,7 @@ _quote_double() {  true ; } ;
 # @example
 #    cat /tmp/anyfile|_dedup_sort
 #    _dedup_sort /tmp/file1 /tmp/file2
+#
 # @stdout a sorted and deduplicated result will be printed to STDOUT
 # @see _dedup()
 _dedup_sort() {  true ; } ;
@@ -58,6 +59,7 @@ _dedup_sort() {  true ; } ;
 #
 # @example
 #    cat /tmp/anyfile|_dedup_sort
+#
 # @stdout a deduplicated result will be printed to STDOUT
 # @see _dedup_sort()
 _dedup() {  true ; } ;
@@ -68,6 +70,7 @@ _dedup() {  true ; } ;
 #
 # @example
 #    cat /tmp/anyfile|_dedup_sort
+#
 # @stdout a deduplicated result will be printed to STDOUT
 # @see _dedup_sort()
 _oneline() {  true ; } ;
