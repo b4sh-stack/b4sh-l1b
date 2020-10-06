@@ -254,7 +254,10 @@ _ssh_keylength() {  if [ $# -eq 0 ];then  cat |ssh-keygen -lf /dev/stdin  |cut -
 
 ##GIT
 
-_git_commitpush() { git add -A ;git commit -m "$(date -u +%Y-%m-%d-%H.%M)"" $COMMITCOMMENT" ; git push ; } ;
+
+_git_submodule_fetch { git submodule foreach "(git checkout master; git pull)&" ; } ;
+
+_git_commitpush() { git submodule foreach "(git checkout master; git pull)&";git add -A ;git commit -m "$(date -u +%Y-%m-%d-%H.%M)"" $COMMITCOMMENT" ; git push ; } ;
 
 
 _git_autocommit() { echo -n;
