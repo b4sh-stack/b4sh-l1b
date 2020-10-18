@@ -1,6 +1,6 @@
 #!/bin/sh
 # @file b4sh-l1b aka bash-lib aka bash library
-# @brief A library that solves some common problems and redefiines missing functions.
+# @brief A library that solves some common problems and redefines missing functions.
 # @description
 #     repository url: https://gitlab.com/b4sh-stack/b4sh-l1b/
 #
