@@ -26,6 +26,8 @@ mirror-github:
 
 
 pages:
+  stage: pages
+  cache: {}
   script:
     - mkdir public
     - cp -r _b4shl1b.sh public/_b4shl1b.sh
