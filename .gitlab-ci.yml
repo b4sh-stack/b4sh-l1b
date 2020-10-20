@@ -4,15 +4,15 @@ before_script:
 #  - ssh-keyscan -t rsa,dsa,ecdsa github.com >> ~/.ssh/ssh_known_hosts
 
 stages:
-  - pages
-  - mirror
+  - pages-and-mirror
+
 
 variables:
   MIRROR_REPOSITORY: "git@github.com:b4sh-stack/b4sh-l1b.git"
   GIT_SUBMODULE_STRATEGY: recursive
 
 mirror-github:
-  stage: mirror
+  stage: pages-and-mirror
   cache: {}
   script:
     # set our privkey
@@ -26,7 +26,7 @@ mirror-github:
 
 
 pages:
-  stage: pages
+  stage: pages-and-mirror
   cache: {}
   script:
     - mkdir public
