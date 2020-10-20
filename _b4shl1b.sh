@@ -5,23 +5,23 @@
 #     repository url: https://gitlab.com/b4sh-stack/b4sh-l1b/
 #
 #     Many common situations end soon on systems that are not GNU/UNIX compatible
-#     e.g. busybox is lacking many functions like tac / rev , even iproute standards like tun are mising in default openwrt builds 
+#     e.g. busybox is lacking many functions like tac / rev , even iproute standards like tun are mising in default openwrt builds
 #
 #     The project solves lots of problems:
 #      * missing tools like **tac** , **nl**, **rev** are defined
-#      * deduplication of STDIN 
+#      * deduplication of STDIN
 #      * timestamps in nanosecond even when host does not provide it(openwrt/busybox)
 #      * docker functions
 #      * git tools for automatic pushing/committing
 #      * ipv4/ipv6 checks
 #      * etc
 #
-#     References: 
-#      * http://sed.sourceforge.net/local/docs/emulating_unix.txt 
-#      * https://edoras.sdsu.edu/doc/sed-oneliners.html  
-#      * https://unix.stackexchange.com/questions/9356/how-can-i-print-lines-from-file-backwards-without-using-tac 
-#      * https://www.geeksforgeeks.org/reverse-a-string-shell-programming/ 
-#      * https://www.unix.com/shell-programming-and-scripting/223077-awk-reverse-string.html 
+#     References:
+#      * http://sed.sourceforge.net/local/docs/emulating_unix.txt
+#      * https://edoras.sdsu.edu/doc/sed-oneliners.html
+#      * https://unix.stackexchange.com/questions/9356/how-can-i-print-lines-from-file-backwards-without-using-tac
+#      * https://www.geeksforgeeks.org/reverse-a-string-shell-programming/
+#      * https://www.unix.com/shell-programming-and-scripting/223077-awk-reverse-string.html
 #      * https://thomas-cokelaer.info/blog/2018/01/awk-convert-into-lower-or-upper-cases/
 #
 
@@ -81,9 +81,33 @@ _dedup() {  true ; } ;
 # @see _dedup_sort()
 _oneline() {  true ; } ;
 
+# @description get numeric UID owner  of file
+#
+# @arg $@ filename to test
+#
+# @example
+#    _file_uid_numeric myfile
+#
+# @stdout the numeric UID will be printed to STDOUT
+# @see _file_gid_numeric()
+_file_uid_numeric()  {  true ; } ;
+
+# @description get numeric owner group of file
+#
+# @arg $@ filename to test
+#
+# @example
+#    _file_gid_numeric myfile
+#
+# @stdout the numeric GID will be printed to STDOUT
+# @see _file_uid_numeric()
+_file_gid_numeric()  {  true ; } ;
 
 
-## 
+
+
+
+##
 
 ### REDEFINE MISSING FUNCTIONS
 
@@ -146,20 +170,28 @@ _mysql_optimize_all_tables() {
 ## DOCKER
 
 
-_reformat_docker_purge() { sed 's/^deleted: .\+:\([[:alnum:]].\{2\}\).\+\([[:alnum:]].\{2\}\)/\1..\2|/g;s/^\(.\)[[:alnum:]].\{61\}\(.\)/\1.\2|/g' |tr -d '\n' ; } ;
 
 
-_docker_stats_json() {
-  docker stats --no-stream --format "{\"container\":\"{{ .Container }}\",\"name\":\"{{ .Name }}\",\"cpu\":\"{{ .CPUPerc }}\",\"memory\":[{\"raw\":\"{{ .MemUsage }}\",\"percent\":\"{{ .MemPerc }}\"}],\"Net RX(in)/TX(out)\":\"{{ .NetIO }}\",\"diskIO READ/WRITE\":\"{{ .BlockIO }}\"}" |sort -k 3 -t : ; } ;
+_reformat_docker_purge()    { sed 's/^deleted: .\+:\([[:alnum:]].\{2\}\).\+\([[:alnum:]].\{2\}\)/\1..\2|/g;s/^\(.\)[[:alnum:]].\{61\}\(.\)/\1.\2|/g' |tr -d '\n' ; } ;
 
 
-_docker_stats_json_all() {
-  docker stats --no-stream --format "{\"container\":\"{{ .Container }}\",\"name\":\"{{ .Name }}\",\"cpu\":\"{{ .CPUPerc }}\",\"memory\":[{\"raw\":\"{{ .MemUsage }}\",\"percent\":\"{{ .MemPerc }}\"}],\"Net RX(in)/TX(out)\":\"{{ .NetIO }}\",\"diskIO READ/WRITE\":\"{{ .BlockIO }}\"}" --all |sort -k 3 -t : ; } ;
+_docker_stats_json()        { docker stats --no-stream --format "{\"container\":\"{{ .Container }}\",\"name\":\"{{ .Name }}\",\"cpu\":\"{{ .CPUPerc }}\",\"memory\":[{\"raw\":\"{{ .MemUsage }}\",\"percent\":\"{{ .MemPerc }}\"}],\"Net RX(in)/TX(out)\":\"{{ .NetIO }}\",\"diskIO READ/WRITE\":\"{{ .BlockIO }}\"}" |sort -k 3 -t : ; } ;
 
-_docker_stats_json_array() { _docker_stats_json "$@" |sed 's/$/,/g'| _oneline |sed 's/^/[/g;s/,$/]/g'  ; } ;
+
+_docker_stats_json_all()    { docker stats --no-stream --format "{\"container\":\"{{ .Container }}\",\"name\":\"{{ .Name }}\",\"cpu\":\"{{ .CPUPerc }}\",\"memory\":[{\"raw\":\"{{ .MemUsage }}\",\"percent\":\"{{ .MemPerc }}\"}],\"Net RX(in)/TX(out)\":\"{{ .NetIO }}\",\"diskIO READ/WRITE\":\"{{ .BlockIO }}\"}" --all |sort -k 3 -t : ; } ;
+
+_docker_stats_json_array()  { _docker_stats_json "$@" |sed 's/$/,/g'| _oneline |sed 's/^/[/g;s/,$/]/g'  ; } ;
 
 _docker_containers_all()    { docker ps -a --format '{{.Names}}' ; } ;
 _docker_containers_exited() { docker ps -a --format '{{.Names}}' --filter "status=exited" ; } ;
+
+_docker_curltest()          { docker exec -it $(basename $(pwd)) /bin/bash -c 'curl  -kvL --header "Host: ${APP_URL}" http://127.0.0.1/'$1 2>&1 ; } ;
+_docker_curltest_www()      { docker exec -it $(basename $(pwd)) /bin/bash -c 'curl  -kvL --header "Host: www.${APP_URL}" http://127.0.0.1/'$1 2>&1 ; } ;
+_docker_curltest_ssl()      { docker exec -it $(basename $(pwd)) /bin/bash -c 'curl  -kvL --header "Host: ${APP_URL}" https://127.0.0.1/'$1 2>&1 ; } ;
+_docker_curltest_www_ssl()  { docker exec -it $(basename $(pwd)) /bin/bash -c 'curl  -kvL --header "Host: www.${APP_URL}" https://127.0.0.1/'$1 2>&1 ; } ;
+_dsh()                      { docker exec -it $(basename $(pwd)) $([ -z "$@" ] && echo bash || echo "$@" ) ; } ;
+_dlogs()                    { docker logs $(basename $(pwd))  2>&1 -f ; } ;
+
 
 ###NETWORK
 
@@ -324,7 +356,7 @@ _virtualbox_snapshot_delete_prompter() {
           echo "(listing:)"; vboxmanage showvminfo "${virmach}"|grep -e Snapshots: -e Name:|sed 's/^/\t|\t\t/g'|while read line;do echo "${virmach}${line}";done ;
         echo "SNAP-UUID=";read virsnap;
         echo "deleting in background , log in /tmp/vbox.snap.del."${virmach// /}.${virsnap// /}.log ;
-        ( vboxmanage snapshot "${virmach}" delete "${virsnap}"  &> /tmp/vbox.snap.del.${virmach// /}.${virsnap// /}.log & ) 
+        ( vboxmanage snapshot "${virmach}" delete "${virsnap}"  &> /tmp/vbox.snap.del.${virmach// /}.${virsnap// /}.log & )
         echo "sleeping 2s , press CTRL+C to exit";sleep 2 ; echo
     done ; } ;
 
