@@ -314,6 +314,27 @@ _git_autocommit() { echo -n;
       done )
  echo -n " "; } ;
 
+_git_rewrite_allcommits() {
+sourcedir=$1
+targetdir=$2
+FAILED=NO
+which git &>/dev/null     || { FAILED=YES ; echo "no git executable" ; } ;
+test -e ${sourcedir}/.git || { FAILED=YES ; echo "no .git in source" ; } ;
+test -e ${targetdir}/.git || { FAILED=YES ; echo "no .git in target" ; } ;
+
+[ "$FAILED" = "NO" ] && {
+
+    cd ${sourcedir}
+    git log --pretty=oneline -a|tac |cut -d" " -f1|while read commit;do
+        git checkout $commit 2>/dev/null;
+        cp * $target/;
+        (cd $target;git add -A ;git commit -m "$commit rewritten" ) &
+        echo sent $commit ;
+    done ; };
+
+echo -n ; } ;
+
+
 ### HTML/CGI-bin
 
 
@@ -384,7 +405,7 @@ _virtualbox_snapshot_create_allmachines_online() {
 
 _virtualbox_snapshot_delete_interactive() { while (true);do
 
-    echo "SNAPSHOT SINGLE DELETTION.."
+    echo "SNAPSHOT SINGLE DELETION.."
 
     echo "VM=";read virmach;
     echo "SNAP-UUID=";read virsnap;
