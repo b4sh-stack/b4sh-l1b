@@ -183,7 +183,7 @@ _docker_stats_json_array()  { _docker_stats_json "$@" |sed 's/$/,/g'| _oneline |
 _docker_containers_all()    { docker ps -a --format '{{.Names}}' ; } ;
 _docker_containers_exited() { docker ps -a --format '{{.Names}}' --filter "status=exited" ; } ;
 
-_docker_container_has_ssh() { docker exec -t "$1" /bin/sh -c "which dropbear ;which openssh-server " 2>/dev/null|wc -l |grep -q 0 && return 1 || return 0 ; }; 
+_docker_container_has_ssh() { docker exec -t "$1" /bin/sh -c "which dropbear ;which openssh-server " 2>/dev/null|wc -l |grep -q 0 && return 1 || return 0 ; };
 _docker_curltest()          { docker exec -it $(basename $(pwd)) /bin/bash -c 'curl  -kvL --header "Host: ${APP_URL}" http://127.0.0.1/'$1 2>&1 ; } ;
 _docker_curltest_www()      { docker exec -it $(basename $(pwd)) /bin/bash -c 'curl  -kvL --header "Host: www.${APP_URL}" http://127.0.0.1/'$1 2>&1 ; } ;
 _docker_curltest_ssl()      { docker exec -it $(basename $(pwd)) /bin/bash -c 'curl  -kvL --header "Host: ${APP_URL}" https://127.0.0.1/'$1 2>&1 ; } ;
