@@ -186,10 +186,10 @@ _docker_containers_exited() { docker ps -a --format '{{.Names}}' --filter "statu
 _docker_get_all_ports()     { docker ps -a --format '{{.Ports}}'|grep -v ^$|sed 's/->.\+//g'|grep -e ^"0\.0\.0\.0" -e^"\[::\]"|sed 's/.\+]//g'|cut -d":" -f2 ; } ;
 
 _docker_container_has_ssh() { docker exec -t "$1" /bin/sh -c "which dropbear ;which openssh-server " 2>/dev/null|wc -l |grep -q 0 && return 1 || return 0 ; };
-_docker_curltest()          { docker exec -it $(basename $(pwd)) /bin/bash -c 'curl  -kvL --header "Host: ${APP_URL}" http://127.0.0.1/'$1 2>&1 ; } ;
-_docker_curltest_www()      { docker exec -it $(basename $(pwd)) /bin/bash -c 'curl  -kvL --header "Host: www.${APP_URL}" http://127.0.0.1/'$1 2>&1 ; } ;
-_docker_curltest_ssl()      { docker exec -it $(basename $(pwd)) /bin/bash -c 'curl  -kvL --header "Host: ${APP_URL}" https://127.0.0.1/'$1 2>&1 ; } ;
-_docker_curltest_www_ssl()  { docker exec -it $(basename $(pwd)) /bin/bash -c 'curl  -kvL --header "Host: www.${APP_URL}" https://127.0.0.1/'$1 2>&1 ; } ;
+_docker_curltest()          { docker exec -it $(basename $(pwd)) /bin/bash -c 'curl  -kvL --header "Host: ${VIRTUAL_HOST}" http://127.0.0.1/'$1 2>&1 ; } ;
+_docker_curltest_www()      { docker exec -it $(basename $(pwd)) /bin/bash -c 'curl  -kvL --header "Host: www.${VIRTUAL_HOST}" http://127.0.0.1/'$1 2>&1 ; } ;
+_docker_curltest_ssl()      { docker exec -it $(basename $(pwd)) /bin/bash -c 'curl  -kvL --header "Host: ${VIRTUAL_HOST}" https://127.0.0.1/'$1 2>&1 ; } ;
+_docker_curltest_www_ssl()  { docker exec -it $(basename $(pwd)) /bin/bash -c 'curl  -kvL --header "Host: www.${VIRTUAL_HOST}" https://127.0.0.1/'$1 2>&1 ; } ;
 _dsh()                      { docker exec -it $(basename $(pwd)) $([ -z "$@" ] && echo bash || echo "$@" ) ; } ;
 _dlogs()                    { docker logs $(basename $(pwd))  2>&1 -f ; } ;
 
@@ -288,8 +288,13 @@ _ssh_keylength() {  if [ $# -eq 0 ];then  cat |ssh-keygen -lf /dev/stdin  |cut -
                     fi
                  }
 
+_net_ip_curlmyip()     { curl -s https://curlmyip.net  ; } ;
+_net_ip_icanhazip()    { curl -s https://icanhazip.com/ ; } ;
+_net_ip_akamai()       { curl -s http://whatismyip.akamai.com ; } ;  ## akamai does not like https
+_net_ip_monip()        { curl -s http://monip.org|sed 's/\(<\|>\)/\n/g;s/: /:/g'|grep IP |cut -d":" -f2|grep -vi monip ; } ;
+_net_ip_myexternalip() { curl -s http://myexternalip.com/|grep -e "My External" -e data-ip|grep -e title -e textarea|sed 's/^.\+>My External IP address -  //g;s/.\+">//g;s/ //g;s/<.\+>//g'|sort -u ; } ;
 
-
+### files/source sync/versioning
 
 ##GIT
 
@@ -297,7 +302,6 @@ _ssh_keylength() {  if [ $# -eq 0 ];then  cat |ssh-keygen -lf /dev/stdin  |cut -
 _git_submodule_fetch() { git submodule foreach "(git checkout master; git pull)&" ; } ;
 
 _git_commitpush() { git submodule foreach "(git checkout master; git pull)&";git add -A ;git commit -m "$(date -u +%Y-%m-%d-%H.%M)"" $COMMITCOMMENT" ; git push ; } ;
-
 
 _git_autocommit() { echo -n;
 	sum=$(find ./ -type f -exec md5sum {} \;|grep -v ".git/" |md5sum);
