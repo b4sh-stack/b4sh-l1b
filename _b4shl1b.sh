@@ -205,6 +205,11 @@ _docker_curltest_www_ssl()  { docker exec -it $(basename $(pwd)) /bin/bash -c 'c
 _dsh()                      { docker exec -it $(basename $(pwd)) $([ -z "$@" ] && echo bash || echo "$@" ) ; } ;
 _dlogs()                    { docker logs $(basename $(pwd))  2>&1 -f ; } ;
 
+## memory
+_mem_process_full()         { ps -ylC  "$1"  | awk '{x += $8;y += 1} END {print "'$1' Memory Usage (MB): "x/1024; print "Average Proccess Size (MB): "x/((y-1)*1024)}' ;  } ;
+_mem_process_full_json()    { ps -ylC  "$1"  | awk '{x += $8;y += 1} END {print " { \"mem_mb_'$1'\":\""x/1024"\"},"; print "Average Proccess Size (MB): "x/((y-1)*1024)}' ;  } ;
+_mem_apache()               { ps -ylC apache2 | awk '{x += $8;y += 1} END {print "Apache Memory Usage (MB): "x/1024; print "Average Proccess Size (MB): "x/((y-1)*1024)}' ; } ;
+
 
 ###NETWORK
 
@@ -309,7 +314,6 @@ _net_ip_myexternalip() { curl -s http://myexternalip.com/|grep -e "My External" 
 ### files/source sync/versioning
 
 ##GIT
-
 
 _git_submodule_fetch() { git submodule foreach "(git checkout master; git pull)&" ; } ;
 
