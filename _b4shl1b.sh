@@ -206,8 +206,8 @@ _dsh()                      { docker exec -it $(basename $(pwd)) $([ -z "$@" ] &
 _dlogs()                    { docker logs $(basename $(pwd))  2>&1 -f ; } ;
 
 ## memory
-_mem_process_full()         { for prcss in $@;do ps -ylC  "${prcss}" | grep "$prcss" |wc -l|grep ^0|| ps -ylC  "${prcss}" | awk '{x += $8;y += 1} END {print "'$1' Memory Usage (MB): "x/1024;       print "Average Proccess Size (MB): "x/((y-1)*1024)}' ;          done ;  } ;
-_mem_process_full_json()    { for prcss in $@;do ps -ylC  "${prcss}" | grep "$prcss" |wc -l|grep ^0|| ps -ylC  "${prcss}" | awk '{x += $8;y += 1} END {print "{ \"mem_mb_sum_'$1'\":\""x/1024"\" }"; print "{ \"mem_mb_avg_'$1'\":\""x/((y-1)*1024)"\" }"}' ; done ; } ;
+_mem_process_full()         { for prcss in $@;do ps -ylC  "${prcss}" | grep "$prcss" |wc -l|grep -q  ^0|| ps -ylC  "${prcss}" | awk '{x += $8;y += 1} END {print "'$1' Memory Usage (MB): "x/1024;       print "Average Proccess Size (MB): "x/((y-1)*1024)}' ;          done ;  } ;
+_mem_process_full_json()    { for prcss in $@;do ps -ylC  "${prcss}" | grep "$prcss" |wc -l|grep -q  ^0|| ps -ylC  "${prcss}" | awk '{x += $8;y += 1} END {print "{ \"mem_mb_sum_'$1'\":\""x/1024"\" }"; print "{ \"mem_mb_avg_'$1'\":\""x/((y-1)*1024)"\" }"}' ; done ; } ;
 _mem_apache()               { ps -ylC apache2 | awk '{x += $8;y += 1} END {print "Apache Memory Usage (MB): "x/1024; print "Average Proccess Size (MB): "x/((y-1)*1024)}' ; } ;
 
 
