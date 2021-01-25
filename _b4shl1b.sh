@@ -207,7 +207,7 @@ _dlogs()                    { docker logs $(basename $(pwd))  2>&1 -f ; } ;
 
 ## memory
 _mem_process_full()         { ps -ylC  "$1"  | awk '{x += $8;y += 1} END {print "'$1' Memory Usage (MB): "x/1024; print "Average Proccess Size (MB): "x/((y-1)*1024)}' ;  } ;
-_mem_process_full_json()    { ps -ylC  "$1"  | awk '{x += $8;y += 1} END {print " { \"mem_mb_'$1'\":\""x/1024"\"},"; print "Average Proccess Size (MB): "x/((y-1)*1024)}' ;  } ;
+_mem_process_full_json()    { ps -ylC  "$1"  | awk '{x += $8;y += 1} END {print "{ \"mem_mb_sum_'$1'\":\""x/1024"\" },"; print "{ \"mem_mb_avg_'$1'\":\""x/((y-1)*1024)"\" }"}' ;  } ;
 _mem_apache()               { ps -ylC apache2 | awk '{x += $8;y += 1} END {print "Apache Memory Usage (MB): "x/1024; print "Average Proccess Size (MB): "x/((y-1)*1024)}' ; } ;
 
 
