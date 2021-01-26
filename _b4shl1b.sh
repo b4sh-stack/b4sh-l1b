@@ -206,8 +206,8 @@ _dsh()                      { docker exec -it $(basename $(pwd)) $([ -z "$@" ] &
 _dlogs()                    { docker logs $(basename $(pwd))  2>&1 -f ; } ;
 
 ## memory
-_mem_process_full()         { for prcss in $@;do ps -ylC  "${prcss}" | grep "$prcss" |wc -l|grep -q  ^0|| ps -ylC  "${prcss}" | awk '{x += $8;y += 1} END {print "'$1' Memory Usage (MB): "x/1024;       print "Average Proccess Size (MB): "x/((y-1)*1024)}' ;          done ;  } ;
-_mem_process_full_json()    { for prcss in $@;do ps -ylC  "${prcss}" | grep "$prcss" |wc -l|grep -q  ^0|| ps -ylC  "${prcss}" | awk '{x += $8;y += 1} END {print "{ \"mem_mb_sum_'$1'\":\""x/1024"\" }"; print "{ \"mem_mb_avg_'$1'\":\""x/((y-1)*1024)"\" }"}' ; done ; } ;
+_mem_process_full()         { for prcss in $@;do ps -ylC  "${prcss}" | grep "$prcss" |wc -l|grep -q  ^0|| ps -ylC  "${prcss}" | awk '{x += $8;y += 1} END {print "'${prcss}' Memory Usage (MB): "x/1024;       print "Average Proccess Size (MB): "x/((y-1)*1024)}' ;          done ;  } ;
+_mem_process_json()         { for prcss in $@;do ps -ylC  "${prcss}" | grep "$prcss" |wc -l|grep -q  ^0|| ps -ylC  "${prcss}" | awk '{x += $8;y += 1} END {print "{ \"mem_mb_sum_'${prcss}'\":\""x/1024"\" }"; print "{ \"mem_mb_avg_'${prcss}'\":\""x/((y-1)*1024)"\" }"}' ; done ; } ;
 _mem_apache()               { ps -ylC apache2 | awk '{x += $8;y += 1} END {print "Apache Memory Usage (MB): "x/1024; print "Average Proccess Size (MB): "x/((y-1)*1024)}' ; } ;
 
 
@@ -310,6 +310,18 @@ _net_ip_icanhazip()    { curl -s https://icanhazip.com/ ; } ;
 _net_ip_akamai()       { curl -s http://whatismyip.akamai.com ; } ;  ## akamai does not like https
 _net_ip_monip()        { curl -s http://monip.org|sed 's/\(<\|>\)/\n/g;s/: /:/g'|grep IP |cut -d":" -f2|grep -vi monip ; } ;
 _net_ip_myexternalip() { curl -s http://myexternalip.com/|grep -e "My External" -e data-ip|grep -e title -e textarea|sed 's/^.\+>My External IP address -  //g;s/.\+">//g;s/ //g;s/<.\+>//g'|sort -u ; } ;
+
+## SSL ##
+
+
+_ssl_host_enddate_days() {
+    target=$1
+    end="$(echo | openssl s_client -connect "$target" 2>/dev/null |openssl x509 -enddate -noout  | sed -e 's#notAfter=##'|awk '{ printf "%04d-%02d-%02d\n", $4,(index("JanFebMarAprMayJunJulAugSepOctNovDec",$1)+2)/3, $2}')";
+    #echo $end
+    date_diff=$(( ($(date -d "$end" +%s) - $(LC_ALL=C date -d "$(LC_ALL=C date +%Y-%m-%d)" +%s) )/(60*60*24) ));printf '%s: %s' "$date_diff" "$target" ; } ;
+
+
+## ↑↑ SSL ↑↑ ##
 
 ### files/source sync/versioning
 
