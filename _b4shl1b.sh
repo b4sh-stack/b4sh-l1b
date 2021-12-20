@@ -107,8 +107,6 @@ _file_gid_numeric()  {  true ; } ;
 
 
 
-##
-
 ### REDEFINE MISSING FUNCTIONS
 
 which tac &>/dev/null || tac() { sed '1!G;h;$!d' $1 ; } ;
@@ -126,11 +124,8 @@ timestamp_nanos() { if [[ $(date +%s%N |wc -c) -eq 20  ]]; then date -u +%s%N;el
 _quote_single() { sed "s/\(^\|$\)/'/g" ; } ;
 _quote_double() { sed 's/\(^\|$\)/"/g' ; } ;
 
-
-_dedup_sort() { sort "$@" | uniq ; };
-
-_dedup() { awk '!x[$0]++' ; } ;
-
+_dedup()      { awk '!x[$0]++'   ; } ;
+_dedup_sort() { sort "$@" | uniq ; } ;
 _oneline() { tr -d '\n' ; } ;
 
 
@@ -151,7 +146,9 @@ function colors_list    {   echo_black "black";   echo_blackb "blackb";   echo_w
 
 ## SYS
 
-_clock() { echo -n WALLCLOCK : |redb ;echo  $( date -u "+%F %T" ) |yellow ; } ;
+_wallclock() { echo -n WALLCLOCK : |redb ;echo  $( date -u "+%F %T" ) |yellow ; } ;
+_txtclock()  { echo  $( date -u "+%F %T" ) |yellow                            ; } ;
+_clock()     { _wallclock                                                     ; } ;
 
 #file age
 _fileage_sec_stat() {  ## returns file age in seconds or 1970-01-01  ## meant for caching
@@ -167,12 +164,13 @@ _file_uid_numeric() { stat -c %u "$@" ; } ;
 
 _chroot_mount() {
     CHR_TARGET=$1
+    [[ -z "$CHR_TARGET" ]] || {
     dirs_there=0;test -d /${CHR_TARGET}/dev && test -d /${CHR_TARGET}/proc && test -d /${CHR_TARGET}/sys && dirs_there=1
-
     if [ "$dirs_there" -eq 1]; then
         #generation : for infolder in dev proc sys dev/pts ;do echo -n "mount --bind /"$infolder'/${CHR_TARGET} '" && ";done;echo
         mount --bind /dev/${CHR_TARGET}  && mount --bind /proc/${CHR_TARGET}  && mount --bind /sys/${CHR_TARGET}  && mount --bind /dev/pts/${CHR_TARGET}  &&  echo "seems mounted use chroot ${CHR_TARGET}" || echo seems something failed
-    fi ; } ;
+    fi                      ; } ;
+        echo -n  ; } ;
 
 _mysql_optimize_all_tables() {
   if [ -z "$1" ]; then return 666; else SBNAME="$1" ;fi #no target no fun
