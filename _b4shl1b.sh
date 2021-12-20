@@ -146,9 +146,9 @@ function colors_list    {   echo_black "black";   echo_blackb "blackb";   echo_w
 
 ## SYS
 
-_wallclock() { echo -n WALLCLOCK : |redb ;echo  $( date -u "+%F %T" ) |yellow ; } ;
-_txtclock()  { echo  $( date -u "+%F %T" ) |yellow                            ; } ;
-_clock()     { _wallclock                                                     ; } ;
+_wallclock()        { echo -n WALLCLOCK : |redb ;echo  $( date -u "+%F %T" ) |yellow ; } ;
+_txtclock()         { echo  $( date -u "+%F %T" ) |yellow                            ; } ;
+_clock()            { _wallclock                                                     ; } ;
 
 #file age
 _fileage_sec_stat() {  ## returns file age in seconds or 1970-01-01  ## meant for caching
@@ -181,10 +181,7 @@ _mysql_optimize_all_tables() {
 
 
 _reformat_docker_purge()    { sed 's/^deleted: .\+:\([[:alnum:]].\{2\}\).\+\([[:alnum:]].\{2\}\)/\1..\2|/g;s/^\(.\)[[:alnum:]].\{61\}\(.\)/\1.\2|/g' |tr -d '\n' ; } ;
-
-
 _docker_stats_json()        { docker stats --no-stream --format "{\"container\":\"{{ .Container }}\",\"name\":\"{{ .Name }}\",\"cpu\":\"{{ .CPUPerc }}\",\"memory\":[{\"raw\":\"{{ .MemUsage }}\",\"percent\":\"{{ .MemPerc }}\"}],\"Net RX(in)/TX(out)\":\"{{ .NetIO }}\",\"diskIO READ/WRITE\":\"{{ .BlockIO }}\"}" |sort -k 3 -t : ; } ;
-
 
 _docker_stats_json_all()    { docker stats --no-stream --format "{\"container\":\"{{ .Container }}\",\"name\":\"{{ .Name }}\",\"cpu\":\"{{ .CPUPerc }}\",\"memory\":[{\"raw\":\"{{ .MemUsage }}\",\"percent\":\"{{ .MemPerc }}\"}],\"Net RX(in)/TX(out)\":\"{{ .NetIO }}\",\"diskIO READ/WRITE\":\"{{ .BlockIO }}\"}" --all |sort -k 3 -t : ; } ;
 
@@ -202,6 +199,16 @@ _docker_curltest_ssl()      { docker exec -it $(basename $(pwd)) /bin/bash -c 'c
 _docker_curltest_www_ssl()  { docker exec -it $(basename $(pwd)) /bin/bash -c 'curl  -kvL --header "Host: www.${VIRTUAL_HOST}" https://127.0.0.1/'$1 2>&1 ; } ;
 _dsh()                      { docker exec -it $(basename $(pwd)) $([ -z "$@" ] && echo bash || echo "$@" ) ; } ;
 _dlogs()                    { docker logs $(basename $(pwd))  2>&1 -f ; } ;
+
+_buildx_arch() {
+    case "$(uname -m)" in
+    aarch64) echo linux/arm64;;
+    x86_64)  echo linux/amd64 ;;
+    armv7l|armv7*) echo linux/arm/v7;;
+    armv6l|armv6*) echo linux/arm/v6;;
+    esac ; } ;
+
+
 
 ## memory
 _mem_process_full()         { for prcss in $@;do ps -ylC  "${prcss}" | grep "$prcss" |wc -l|grep -q  ^0|| ps -ylC  "${prcss}" | awk '{x += $8;y += 1} END {print "'${prcss}' Memory Usage (MB): "x/1024;       print "Average Proccess Size (MB): "x/((y-1)*1024)}' ;          done ;  } ;
