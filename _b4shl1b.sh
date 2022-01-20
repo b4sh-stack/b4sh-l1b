@@ -109,6 +109,8 @@ _file_gid_numeric()  {  true ; } ;
 
 ### REDEFINE MISSING FUNCTIONS
 
+which 2>&1|grep -q "command not found" && which() { [[ -z "$1" ]] && return false; find ${PATH/:} -type f -executable -name "$1" ; } ;
+
 which tac &>/dev/null || tac() { sed '1!G;h;$!d' $1 ; } ;
 
 which nl &>/dev/null || nl() { sed = $1 |  sed 'N; s/^/     /; s/ *\(.\{6,\}\)\n/\1  /' ; } ;
@@ -310,9 +312,9 @@ _ssh_keylength() {  if [ $# -eq 0 ];then  cat |ssh-keygen -lf /dev/stdin  |cut -
                     fi
                  }
 
-_net_ip_curlmyip()     { curl -s https://curlmyip.net  ; } ;
-_net_ip_icanhazip()    { curl -s https://icanhazip.com/ ; } ;
-_net_ip_akamai()       { curl -s http://whatismyip.akamai.com ; } ;  ## akamai does not like https
+_net_ip_curlmyip()     { curl -s https://curlmyip.net                                                                  ; } ;
+_net_ip_icanhazip()    { curl -s https://icanhazip.com/                                                                ; } ;
+_net_ip_akamai()       { curl -s http://whatismyip.akamai.com                                                          ; } ;  ## akamai does not like https
 _net_ip_monip()        { curl -s http://monip.org|sed 's/\(<\|>\)/\n/g;s/: /:/g'|grep IP |cut -d":" -f2|grep -vi monip ; } ;
 _net_ip_myexternalip() { curl -s http://myexternalip.com/|grep -e "My External" -e data-ip|grep -e title -e textarea|sed 's/^.\+>My External IP address -  //g;s/.\+">//g;s/ //g;s/<.\+>//g'|sort -u ; } ;
 
